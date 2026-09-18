@@ -1,0 +1,6 @@
+{
+  "name": "ASTU ARA Laboratory Allocation System",
+  "description": "Adama Science and Technology University (ASTU) Laboratory Block Responsibility, Key-Holder Assignment, and Course Preference Auto-Assignment System (SRS v2.0).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
