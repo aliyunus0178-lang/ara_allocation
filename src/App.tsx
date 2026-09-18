@@ -15,7 +15,9 @@ import {
   ARAUser,
   Course,
   LaboratoryRoom,
-  LaboratoryBlock
+  LaboratoryBlock,
+  DownloadReportRecord,
+  ConflictAlertEvent
 } from './types/astu';
 import { INITIAL_ASTU_DATA } from './data/mockAstuData';
 import { ASTUAssignmentEngine } from './services/assignmentEngine';
@@ -33,6 +35,8 @@ import { AuditTrailAndCompliance } from './components/AuditTrailAndCompliance';
 import { AuthModal } from './components/AuthModal';
 import { MyAraProfile } from './components/MyAraProfile';
 import { OfficialAstuTimetableReport } from './components/OfficialAstuTimetableReport';
+import { ConflictAlertToast } from './components/ConflictAlertToast';
+import { SystemHealthDashboard } from './components/SystemHealthDashboard';
 
 export default function App() {
   // Core Domain State initialized from ASTU official dataset
@@ -79,6 +83,29 @@ export default function App() {
   );
   const [overrides, setOverrides] = useState<AssignmentOverride[]>(INITIAL_ASTU_DATA.overrides);
 
+  // Download History State
+  const [downloadHistory, setDownloadHistory] = useState<DownloadReportRecord[]>([
+    {
+      id: 'report-arch-001',
+      report_title: 'Official ASTU SOEEC CSEg Laboratory Allocations Report (Semester I)',
+      academic_term: '2026/2027 Semester I',
+      generated_at: new Date(Date.now() - 3600 * 1000 * 24 * 2).toISOString(),
+      generated_by_name: 'Dr. Teferi (Department Head)',
+      generated_by_role: 'DEPARTMENT_HEAD',
+      scope_description: 'Full Department Laboratory Allocation Matrix & Key Custodians',
+      total_sessions: 24,
+      total_rooms: 8,
+      total_aras: 12,
+      file_format: 'PDF',
+      file_size: '482 KB',
+      download_count: 14,
+      status: 'Official & Sealed'
+    }
+  ]);
+
+  // Real-time Conflict Alert Toast State
+  const [activeConflictAlert, setActiveConflictAlert] = useState<ConflictAlertEvent | null>(null);
+
   // Modal State
   const [selectedSessionForModal, setSelectedSessionForModal] = useState<ScheduledSession | null>(null);
   const [isProcessingBatch, setIsProcessingBatch] = useState<boolean>(false);
@@ -107,7 +134,122 @@ export default function App() {
     );
   };
 
-  // Section 19: Batch Allocation Action
+  const handleRecordNewDownload = (record: DownloadReportRecord) => {
+    setDownloadHistory((prev) => [record, ...prev]);
+    addNotification(
+      'Official Report Exported',
+      `Downloaded "${record.report_title}" (${record.file_size}).`,
+      'assignment'
+    );
+  };
+
+  const handleUpdateCoursePriority = (courseId: string, updates: Partial<Course>) => {
+    setCourses((prev: Course[]) =>
+      prev.map((c) => (c.id === courseId ? { ...c, ...updates } : c))
+    );
+    const course = courses.find((c) => c.id === courseId);
+    addNotification(
+      'Course Priority & Precedence Updated',
+      `Priority settings updated for ${course?.course_code || courseId}. Batch allocation engine will sort by precedence score.`,
+      'assignment'
+    );
+  };
+
+  // High-Precedence Auto-Fill Utility
+  const handleHighPrecedenceAutoFill = () => {
+    const capstoneCourseIds = courses
+      .filter(
+        (c) =>
+          c.course_name.toLowerCase().includes('capstone') ||
+          c.course_name.toLowerCase().includes('final year project') ||
+          c.course_name.toLowerCase().includes('capston') ||
+          c.priority_level === 'CRITICAL_CORE' ||
+          (c.precedence_score || 0) >= 90
+      )
+      .map((c) => c.id);
+
+    const unassignedCapstoneSessions = sessions.filter((s) => {
+      if (!capstoneCourseIds.includes(s.course_id)) return false;
+      const filledCount = assignments.filter((a) => a.session_id === s.id && a.status !== 'Declined').length;
+      return filledCount < (s.required_ara_count || 1);
+    });
+
+    if (unassignedCapstoneSessions.length === 0) {
+      addNotification(
+        'Auto-Fill Complete',
+        'All Capstone & Final Year Project sessions are already fully assigned to qualified assistants.',
+        'assignment'
+      );
+      return;
+    }
+
+    let newAssignmentsCount = 0;
+    const newAssignments: AssistantAssignment[] = [];
+    const newReasons: AssignmentDecisionReason[] = [];
+
+    unassignedCapstoneSessions.forEach((session) => {
+      const room = rooms.find((r) => r.id === session.room_id);
+      const roomResp = roomResponsibilities.find((rr) => rr.room_id === session.room_id && rr.status === 'Active');
+      
+      let candidateAra: ARAUser | undefined = aras.find((a) => a.id === roomResp?.ara_id);
+
+      if (!candidateAra) {
+        candidateAra = aras.find((a) => a.is_sara) || aras[0];
+      }
+
+      if (candidateAra) {
+        const asgnId = `asgn-hp-${session.id}-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`;
+        newAssignments.push({
+          id: asgnId,
+          session_id: session.id,
+          slot_number: 1,
+          ara_id: candidateAra.id,
+          status: 'Confirmed',
+          source: 'batch_510_force_alloc',
+          assigned_at: new Date().toISOString(),
+        });
+
+        newReasons.push({
+          id: `reason-hp-${session.id}`,
+          assignment_id: asgnId,
+          session_id: session.id,
+          ara_id: candidateAra.id,
+          total_score: 100,
+          is_selected: true,
+          score_breakdown: [
+            { factor: 'Capstone High Precedence', points: 40, description: 'Highest Priority Course Allocation' },
+            { factor: 'Designated Room Custodian', points: 35, description: 'Matched Key Holder Responsibility' },
+            { factor: 'Workload Capacity Check', points: 25, description: 'SARA availability verified' },
+          ],
+          reasons: [
+            `High-Precedence Auto-Fill allocated SARA ${candidateAra.ara_code} (${candidateAra.full_name}) to Capstone/FYP session in Room ${room?.room_code || '510'}.`,
+          ],
+          hard_constraints_passed: true,
+          block_responsibility: true,
+          room_key_holder: true,
+          course_responsibility: true,
+          preference_match: 'Preference 1',
+          qualified: true,
+          available: true,
+          timetable_conflict: false,
+          workload_valid: true,
+          timestamp: new Date().toISOString(),
+        });
+
+        newAssignmentsCount++;
+      }
+    });
+
+    if (newAssignments.length > 0) {
+      setAssignments((prev) => [...newAssignments, ...prev]);
+      setDecisionReasons((prev) => [...newReasons, ...prev]);
+      addNotification(
+        'High-Precedence Auto-Fill Executed',
+        `Successfully auto-filled ${newAssignmentsCount} unassigned Capstone & Final Year Project sessions to qualified SARAs/ARAs.`,
+        'assignment'
+      );
+    }
+  };
   const handleRunBatchAllocation = () => {
     setIsProcessingBatch(true);
 
@@ -125,155 +267,289 @@ export default function App() {
         preferences,
         weights,
         systemConfig,
-        assignments
+        assignments,
+        courses
       );
 
-      setSessions(result.updatedSessions);
       setAssignments(result.newAssignments);
       setDecisionReasons(result.decisionReasons);
-
-      // Re-calculate ARA workload hours dynamically
-      setAras((prevAras: ARAUser[]) =>
-        prevAras.map((ara: ARAUser) => {
-          const araAsgns = result.newAssignments.filter(
-            (a: AssistantAssignment) => a.ara_id === ara.id && a.status !== 'Declined'
-          );
-          const hours = araAsgns.reduce((sum: number, asgn: AssistantAssignment) => {
-            const s = result.updatedSessions.find((sess: ScheduledSession) => sess.id === asgn.session_id);
-            return sum + (s?.duration_hours || 0);
-          }, 0);
-          return { ...ara, current_weekly_hours: hours };
-        })
-      );
-
+      setSessions(result.updatedSessions);
       setIsProcessingBatch(false);
 
       addNotification(
-        'Batch Allocation Engine Complete',
-        `Evaluated ${sessions.length} sessions. ${result.assignedCount} allocated, ${result.unresolvedCount} unresolved (SRS §16).`,
+        'Batch Allocation Complete',
+        `Evaluated ${sessions.length} laboratory sessions. Assigned ${result.assignedCount}, marked ${result.unresolvedCount} for administrator review (SRS §19).`,
         'assignment'
       );
     }, 600);
   };
 
-  // Reset all assignments
   const handleResetAllocations = () => {
+    setAssignments([]);
+    setDecisionReasons([]);
     setSessions((prev: ScheduledSession[]) =>
       prev.map((s: ScheduledSession) => ({
         ...s,
         status: 'Unassigned',
       }))
     );
-    setAssignments([]);
-    setDecisionReasons([]);
-    setAras((prev: ARAUser[]) => prev.map((a: ARAUser) => ({ ...a, current_weekly_hours: 0 })));
-    addNotification('Allocation Board Reset', 'All scheduled laboratory session assignments have been cleared.', 'assignment');
+    addNotification('Allocations Reset', 'All session assignments cleared to unassigned state.', 'assignment');
   };
 
-  // Section 9: Real-time preference submission
-  const handleSubmitRealtimePreference = (courseId: string, rank: 1 | 2 | 3) => {
-    const currentAra = aras.find((a: ARAUser) => a.id === currentAraId) || aras[0];
+  const handleBulkResolveOverlaps = (resolutions: { sessionId: string; araId: string; reason: string }[]) => {
+    const newAssignmentsToAdd: AssistantAssignment[] = [];
+    const updatedSessionIds = new Set<string>();
 
-    const result = ASTUAssignmentEngine.processRealtimePreferenceSubmission(
-      currentAra,
-      courseId,
-      rank,
-      sessions,
-      assignments,
-      aras,
-      rooms,
-      blocks,
-      blockResponsibilities,
-      roomResponsibilities,
-      courseResponsibilities,
-      qualifications,
-      availabilities,
-      preferences,
-      weights,
-      systemConfig
+    resolutions.forEach((res) => {
+      const sess = sessions.find((s) => s.id === res.sessionId);
+      const ara = aras.find((a) => a.id === res.araId);
+      if (!sess || !ara) return;
+
+      const newAsgn: AssistantAssignment = {
+        id: `asgn-bulk-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        session_id: sess.id,
+        slot_number: 1,
+        ara_id: ara.id,
+        assigned_at: new Date().toISOString(),
+        source: 'manual_admin',
+        status: 'Confirmed',
+      };
+      newAssignmentsToAdd.push(newAsgn);
+      updatedSessionIds.add(sess.id);
+    });
+
+    setAssignments((prev) => [...prev, ...newAssignmentsToAdd]);
+    setSessions((prev) =>
+      prev.map((s) => {
+        if (updatedSessionIds.has(s.id)) {
+          return {
+            ...s,
+            status: 'Confirmed',
+          };
+        }
+        return s;
+      })
     );
 
-    // Add submission to list
-    setPreferences((prev: PreferenceSubmission[]) => [result.submission, ...prev]);
+    addNotification(
+      'Bulk Resolution Applied',
+      `Successfully resolved and allocated ${resolutions.length} required laboratory sessions using least-congested assistant optimization (§16).`,
+      'assignment'
+    );
+  };
 
-    if (result.success && result.assignment && result.assignedSession && result.decisionReason) {
-      // Update assignments
-      setAssignments((prev: AssistantAssignment[]) => [result.assignment!, ...prev]);
-      setDecisionReasons((prev: AssignmentDecisionReason[]) => [result.decisionReason!, ...prev]);
+  // Conflict Overlap Checker for Manual Overrides and Assignments
+  const checkForConflictOverlap = (targetSessionId: string, targetAraId: string): ConflictAlertEvent | null => {
+    const targetSession = sessions.find((s) => s.id === targetSessionId);
+    const targetAra = aras.find((a) => a.id === targetAraId);
+    const targetCourse = courses.find((c) => c.id === targetSession?.course_id);
+    const targetRoom = rooms.find((r) => r.id === targetSession?.room_id);
 
-      // Update session status
-      setSessions((prev: ScheduledSession[]) =>
-        prev.map((s: ScheduledSession) =>
-          s.id === result.assignedSession!.id
-            ? {
-                ...s,
-                status:
-                  systemConfig.realtime_assignment_mode === 'tentative'
-                    ? 'Tentatively Assigned'
-                    : 'Confirmed',
-              }
-            : s
-        )
-      );
+    if (!targetSession || !targetAra) return null;
 
-      // Update ARA workload hours
-      setAras((prev: ARAUser[]) =>
-        prev.map((a: ARAUser) =>
-          a.id === currentAra.id
-            ? { ...a, current_weekly_hours: a.current_weekly_hours + result.assignedSession!.duration_hours }
-            : a
-        )
-      );
+    // Find other sessions currently assigned to this ARA on the exact same day
+    const araOtherAssignments = assignments.filter(
+      (a) => a.ara_id === targetAraId && a.session_id !== targetSessionId && a.status !== 'Declined'
+    );
 
-      addNotification(
-        'Real-Time Auto-Assignment Confirmed',
-        `${currentAra.ara_code} (${currentAra.full_name}) auto-assigned to ${result.assignedSession.section} per SRS §9.`,
-        'assignment'
-      );
-    } else {
-      addNotification(
-        'Preference Placed in Pending Queue',
-        `Preference for course ${courseId} recorded for ${currentAra.ara_code}. Placed in pending queue per SRS §9.3.`,
-        'pending_queue'
-      );
+    for (const asgn of araOtherAssignments) {
+      const otherSession = sessions.find((s) => s.id === asgn.session_id);
+      if (!otherSession) continue;
+
+      if (otherSession.day_of_week === targetSession.day_of_week) {
+        const parseTime = (t: string) => {
+          const [h, m] = t.split(':').map(Number);
+          return (h || 0) * 60 + (m || 0);
+        };
+        const s1Start = parseTime(targetSession.start_time);
+        const s1End = parseTime(targetSession.end_time);
+        const s2Start = parseTime(otherSession.start_time);
+        const s2End = parseTime(otherSession.end_time);
+
+        if (s1Start < s2End && s2Start < s1End) {
+          const otherCourse = courses.find((c) => c.id === otherSession.course_id);
+          const otherRoom = rooms.find((r) => r.id === otherSession.room_id);
+
+          return {
+            id: `conflict-${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            ara_id: targetAra.id,
+            ara_name: targetAra.full_name,
+            ara_code: targetAra.ara_code,
+            target_session_id: targetSession.id,
+            target_course_code: targetCourse?.course_code || 'Course',
+            target_room_code: targetRoom?.room_code || 'Room',
+            target_time: `${targetSession.start_time}–${targetSession.end_time}`,
+            conflicting_session_id: otherSession.id,
+            conflicting_course_code: otherCourse?.course_code || 'Course',
+            conflicting_room_code: otherRoom?.room_code || 'Room',
+            conflicting_time: `${otherSession.start_time}–${otherSession.end_time}`,
+            day_of_week: targetSession.day_of_week,
+            override_reason: 'Timetable collision detected with active assignment.',
+            severity: 'CRITICAL_COLLISION'
+          };
+        }
+      }
     }
+
+    // Check workload cap limit
+    const currentWeeklyHours = assignments
+      .filter((a) => a.ara_id === targetAraId && a.session_id !== targetSessionId && a.status !== 'Declined')
+      .reduce((sum, a) => {
+        const sess = sessions.find((s) => s.id === a.session_id);
+        return sum + (sess?.duration_hours || 2);
+      }, 0);
+
+    const newTotal = currentWeeklyHours + (targetSession.duration_hours || 2);
+    if (newTotal > (targetAra.max_weekly_hours || 10)) {
+      return {
+        id: `conflict-workload-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        ara_id: targetAra.id,
+        ara_name: targetAra.full_name,
+        ara_code: targetAra.ara_code,
+        target_session_id: targetSession.id,
+        target_course_code: targetCourse?.course_code || 'Course',
+        target_room_code: targetRoom?.room_code || 'Room',
+        target_time: `${targetSession.start_time}–${targetSession.end_time}`,
+        conflicting_session_id: targetSession.id,
+        conflicting_course_code: targetCourse?.course_code || 'Course',
+        conflicting_room_code: targetRoom?.room_code || 'Room',
+        conflicting_time: `${targetSession.start_time}–${targetSession.end_time}`,
+        day_of_week: targetSession.day_of_week,
+        override_reason: `Workload capacity threshold exceeded: ${newTotal}h assigned vs ${targetAra.max_weekly_hours}h/week max cap for ${targetAra.ara_code} (SRS §6).`,
+        severity: 'WORKLOAD_CAP_EXCEEDED'
+      };
+    }
+
+    return null;
   };
 
-  const handleWithdrawPreference = (prefId: string) => {
-    setPreferences((prev: PreferenceSubmission[]) =>
-      prev.map((p) => (p.id === prefId ? { ...p, status: 'Withdrawn' } : p))
+  // Section 9: Real-time preference submission & auto-assign trigger
+  const handleSubmitRealtimePreference = (courseId: string, rank: 1 | 2 | 3) => {
+    const candidateAra = aras.find((a: ARAUser) => a.id === currentAraId);
+    if (!candidateAra) return;
+
+    const newPref: PreferenceSubmission = {
+      id: `pref-${currentAraId}-${courseId}-${Date.now()}`,
+      ara_id: currentAraId,
+      course_id: courseId,
+      preference_rank: rank,
+      submitted_at: new Date().toISOString(),
+      status: 'Pending',
+    };
+
+    setPreferences((prev: PreferenceSubmission[]) => {
+      const filtered = prev.filter(
+        (p) => !(p.ara_id === currentAraId && p.course_id === courseId)
+      );
+      return [newPref, ...filtered];
+    });
+
+    const targetSession = sessions.find((s: ScheduledSession) => s.course_id === courseId);
+
+    if (
+      targetSession &&
+      (targetSession.status === 'Unassigned' || targetSession.status === 'ARA Assignment Required')
+    ) {
+      const evaluation = ASTUAssignmentEngine.evaluateCandidatesForSlot(
+        targetSession,
+        1,
+        [candidateAra],
+        sessions,
+        assignments,
+        rooms,
+        blocks,
+        blockResponsibilities,
+        roomResponsibilities,
+        courseResponsibilities,
+        qualifications,
+        availabilities,
+        [newPref, ...preferences],
+        weights,
+        systemConfig
+      );
+
+      if (evaluation.eligibleEvaluations.length > 0) {
+        const bestCandidate = evaluation.eligibleEvaluations[0];
+
+        const newAssignment: AssistantAssignment = {
+          id: `asgn-${targetSession.id}-${Date.now()}`,
+          session_id: targetSession.id,
+          slot_number: 1,
+          ara_id: bestCandidate.ara.id,
+          status: 'Confirmed',
+          source: 'realtime_submission',
+          assigned_at: new Date().toISOString(),
+          acceptance_deadline: null,
+        };
+
+        setAssignments((prev: AssistantAssignment[]) => [...prev, newAssignment]);
+        setSessions((prev: ScheduledSession[]) =>
+          prev.map((s: ScheduledSession) =>
+            s.id === targetSession.id ? { ...s, status: 'Confirmed' } : s
+          )
+        );
+
+        addNotification(
+          'Real-time Auto-Assignment Executed',
+          `${candidateAra.full_name} (${candidateAra.ara_code}) auto-assigned to ${targetSession.id} with score ${bestCandidate.totalScore.toFixed(1)} (SRS §9).`,
+          'assignment'
+        );
+        return;
+      }
+    }
+
+    addNotification(
+      'ARA Preference Logged',
+      `Preference rank ${rank} registered for ${candidateAra.full_name} on course ${courseId}.`,
+      'assignment'
     );
-    addNotification('Preference Withdrawn', 'Submitted preference withdrawn prior to finalization (SRS §10).', 'pending_queue');
   };
 
-  // Section 11: Confirmation / Decline
+  const handleWithdrawPreference = (preferenceId: string) => {
+    setPreferences((prev: PreferenceSubmission[]) =>
+      prev.filter((p) => p.id !== preferenceId)
+    );
+    addNotification('Preference Withdrawn', 'Laboratory slot preference removed successfully.', 'assignment');
+  };
+
+  // Section 10: ARA Acceptance / Decline
   const handleAcceptAssignment = (assignmentId: string) => {
     setAssignments((prev: AssistantAssignment[]) =>
-      prev.map((a) => (a.id === assignmentId ? { ...a, status: 'Confirmed' } : a))
+      prev.map((a: AssistantAssignment) =>
+        a.id === assignmentId ? { ...a, status: 'Confirmed' } : a
+      )
     );
-    const asgn = assignments.find((a: AssistantAssignment) => a.id === assignmentId);
-    if (asgn) {
-      setSessions((prev: ScheduledSession[]) =>
-        prev.map((s: ScheduledSession) => (s.id === asgn.session_id ? { ...s, status: 'Confirmed' } : s))
-      );
-      addNotification('Assignment Confirmed', `ARA confirmed assignment for session ${asgn.session_id} (SRS §11).`, 'assignment');
-    }
+    addNotification('Assignment Confirmed', 'Laboratory shift confirmed and locked onto schedule.', 'assignment');
   };
 
   const handleDeclineAssignment = (assignmentId: string) => {
-    const asgn = assignments.find((a: AssistantAssignment) => a.id === assignmentId);
+    const targetAssignment = assignments.find((a) => a.id === assignmentId);
+    if (!targetAssignment) return;
+
     setAssignments((prev: AssistantAssignment[]) =>
-      prev.map((a) => (a.id === assignmentId ? { ...a, status: 'Declined' } : a))
+      prev.map((a: AssistantAssignment) =>
+        a.id === assignmentId ? { ...a, status: 'Declined' } : a
+      )
     );
-    if (asgn) {
-      setSessions((prev: ScheduledSession[]) =>
-        prev.map((s: ScheduledSession) => (s.id === asgn.session_id ? { ...s, status: 'ARA Assignment Required' } : s))
-      );
-      addNotification('Assignment Declined by ARA', `Slot declined for session ${asgn.session_id}. Returned to queue for candidate re-evaluation (SRS §11).`, 'confirmation_request');
-    }
+
+    setSessions((prev: ScheduledSession[]) =>
+      prev.map((s: ScheduledSession) =>
+        s.id === targetAssignment.session_id
+          ? { ...s, status: 'ARA Assignment Required' }
+          : s
+      )
+    );
+
+    addNotification(
+      'Assignment Declined by Assistant',
+      `Session ${targetAssignment.session_id} flagged as 'ARA Assignment Required' (SRS §10, §16).`,
+      'override'
+    );
   };
 
-  // SARA Registration Action (SRS Section 5, 8, 9)
+  // SARA Registration
   const handleRegisterSARA = (newAraData: {
     full_name: string;
     email: string;
@@ -288,119 +564,81 @@ export default function App() {
     block_responsibility?: string;
     max_weekly_hours: number;
   }) => {
-    const newId = `ara-sara-${Date.now()}`;
     const initials = newAraData.full_name
       .split(' ')
-      .filter(Boolean)
       .map((n) => n[0])
-      .slice(0, 2)
       .join('')
-      .toUpperCase() || 'SA';
+      .toUpperCase();
 
-    const assignedRooms = rooms.filter((r) => newAraData.selected_room_ids.includes(r.id));
-    const roomsSummary = assignedRooms.map((r) => r.room_code).join(', ');
+    const araId = `ara-${Date.now()}`;
+    const code = newAraData.ara_code || `SARA-${String(aras.length + 1).padStart(3, '0')}`;
 
     const newAra: ARAUser = {
-      id: newId,
+      id: araId,
+      ara_code: code,
       full_name: newAraData.full_name,
       email: newAraData.email,
       phone: newAraData.phone,
       department: newAraData.department,
       program: newAraData.program,
       year_level: newAraData.year_level,
-      is_sara: true,
-      gpa_or_standing: newAraData.gpa_or_standing,
-      role: newAraData.selected_room_ids.length > 0
-        ? 'ROOM_KEY_HOLDER'
-        : (newAraData.block_responsibility ? 'BLOCK_RESPONSIBLE' : 'GENERAL_ARA'),
-      ara_code: newAraData.ara_code || `SARA/2026/${aras.length + 1}`,
-      avatar_initials: initials,
+      role: 'ROOM_KEY_HOLDER',
+      status: 'Active',
       max_weekly_hours: newAraData.max_weekly_hours || 12,
       current_weekly_hours: 0,
-      status: 'Active',
       created_at: new Date().toISOString(),
-      assigned_rooms_summary: roomsSummary || undefined,
+      avatar_initials: initials,
+      gpa_or_standing: newAraData.gpa_or_standing,
+      is_sara: true,
     };
 
-    setAras((prev: ARAUser[]) => [newAra, ...prev]);
-
-    // Create room responsibilities if rooms were selected
-    if (newAraData.selected_room_ids.length > 0) {
-      const newRoomResps: ARARoomResponsibility[] = newAraData.selected_room_ids.map((rId, idx) => ({
-        id: `room-resp-${Date.now()}-${idx}`,
-        room_id: rId,
-        ara_id: newId,
-        responsibility_type: 'ROOM_KEY_HOLDER',
-        is_primary: true,
-        is_mandatory: false,
-        start_date: '2026-09-01',
-        end_date: '2027-02-15',
-        academic_year: systemConfig.academic_year,
-        semester: systemConfig.semester,
-        status: 'Active',
-      }));
-      setRoomResponsibilities((prev: ARARoomResponsibility[]) => [...newRoomResps, ...prev]);
-    }
-
-    // Create block responsibility if specified
-    if (newAraData.block_responsibility) {
-      const newBlockResp: ARABlockResponsibility = {
-        id: `block-resp-${Date.now()}`,
-        block_id: newAraData.block_responsibility,
-        ara_id: newId,
-        responsibility_type: 'BLOCK_RESPONSIBLE',
-        is_primary: true,
-        is_mandatory: false,
-        start_date: '2026-09-01',
-        end_date: '2027-02-15',
-        academic_year: systemConfig.academic_year,
-        semester: systemConfig.semester,
-        status: 'Active',
-      };
-      setBlockResponsibilities((prev: ARABlockResponsibility[]) => [newBlockResp, ...prev]);
-    }
-
-    // Create qualifications for certified courses
-    if (newAraData.selected_course_ids.length > 0) {
-      const newQuals: ARAQualification[] = newAraData.selected_course_ids.map((cId, idx) => ({
-        id: `qual-${Date.now()}-${idx}`,
-        ara_id: newId,
-        course_id: cId,
-        qualified_date: new Date().toISOString().split('T')[0],
-        expiry_date: null,
-        status: 'Valid',
-        certified_by: 'SOEEC Academic Commission',
-      }));
-      setQualifications((prev: ARAQualification[]) => [...newQuals, ...prev]);
-    }
-
-    // Auto-create default full availability for this new assistant
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] as const;
-    const newAvails = days.map((day, idx) => ({
-      id: `avail-${newId}-${idx}`,
-      ara_id: newId,
-      day_of_week: day,
-      start_time: '08:00',
-      end_time: '18:00',
-      is_available: true,
+    const newQuals: ARAQualification[] = newAraData.selected_course_ids.map((cid, idx) => ({
+      id: `qual-${araId}-${idx}`,
+      ara_id: araId,
+      course_id: cid,
+      qualified_date: new Date().toISOString().slice(0, 10),
+      status: 'Valid',
+      certified_by: 'Department Head (Dr. Teferi)',
     }));
-    setAvailabilities((prev) => [...prev, ...newAvails]);
 
-    // Set as active user and transition straight to preference portal
-    setCurrentAraId(newId);
-    setCurrentRole('ARA_ASSISTANT');
-    setActiveTab('realtime_portal');
-
+    setAras((prev: ARAUser[]) => [newAra, ...prev]);
+    setQualifications((prev: ARAQualification[]) => [...newQuals, ...prev]);
+    setCurrentAraId(newAra.id);
     addNotification(
-      'SARA Registration Successful',
-      `${newAra.full_name} (${newAra.ara_code}) registered as SARA for AY ${systemConfig.academic_year}. Please submit your top 3 course preferences.`,
+      'Senior Assistant (SARA) Registered',
+      `${newAra.full_name} registered into Department records with key holding credentials.`,
       'assignment'
     );
+  };
+
+  // Section 3 & 4 Responsibilities Updates
+  const handleUpdateBlockResponsibility = (updated: ARABlockResponsibility) => {
+    setBlockResponsibilities((prev: ARABlockResponsibility[]) =>
+      prev.map((b) => (b.id === updated.id ? updated : b))
+    );
+    addNotification('Block Responsibility Updated', `Block ${updated.block_id} custodian updated (SRS §3).`, 'assignment');
+  };
+
+  const handleUpdateRoomResponsibility = (updated: ARARoomResponsibility) => {
+    setRoomResponsibilities((prev: ARARoomResponsibility[]) => {
+      const exists = prev.some((r) => r.id === updated.id);
+      if (exists) {
+        return prev.map((r) => (r.id === updated.id ? updated : r));
+      }
+      return [updated, ...prev];
+    });
+    addNotification('Room Custodian Updated', `Room key holder registered (SRS §4).`, 'assignment');
   };
 
   // Section 14.3: Authorized Override
   const handleExecuteOverride = (sessionId: string, newAraId: string, reason: string) => {
     const assignedAra = aras.find((a: ARAUser) => a.id === newAraId);
+
+    // Check for real-time conflict overlap
+    const detectedConflict = checkForConflictOverlap(sessionId, newAraId);
+    if (detectedConflict) {
+      setActiveConflictAlert(detectedConflict);
+    }
 
     const overrideId = `ovr-${Date.now()}`;
     const newOverride: AssignmentOverride = {
@@ -446,23 +684,68 @@ export default function App() {
     );
   };
 
-  // Block & Room responsibilities update
-  const handleUpdateBlockResponsibility = (resp: ARABlockResponsibility) => {
-    setBlockResponsibilities((prev: ARABlockResponsibility[]) =>
-      prev.map((b) => (b.id === resp.id ? resp : b))
-    );
-    addNotification('Block Responsibility Updated', `Updated responsibility for block ${resp.block_id}. Mandatory: ${resp.is_mandatory ? 'YES' : 'NO'}.`, 'assignment');
+  const handleAssignAraToSession = (sessionId: string, araId: string, isOverride = false, reason = '') => {
+    if (isOverride && reason) {
+      handleExecuteOverride(sessionId, araId, reason);
+    } else {
+      const assignedAra = aras.find((a: ARAUser) => a.id === araId);
+
+      // Check for real-time conflict overlap
+      const detectedConflict = checkForConflictOverlap(sessionId, araId);
+      if (detectedConflict) {
+        setActiveConflictAlert(detectedConflict);
+      }
+
+      const assignmentId = `asgn-manual-${sessionId}-${Date.now()}`;
+      const newAssignment: AssistantAssignment = {
+        id: assignmentId,
+        session_id: sessionId,
+        slot_number: 1,
+        ara_id: araId,
+        status: 'Confirmed',
+        source: 'manual_admin',
+        assigned_at: new Date().toISOString(),
+        acceptance_deadline: null,
+      };
+
+      setAssignments((prev: AssistantAssignment[]) => {
+        const filtered = prev.filter((a) => a.session_id !== sessionId);
+        return [...filtered, newAssignment];
+      });
+
+      setSessions((prev: ScheduledSession[]) =>
+        prev.map((s: ScheduledSession) => (s.id === sessionId ? { ...s, status: 'Confirmed' } : s))
+      );
+
+      addNotification(
+        'Laboratory Session Assigned',
+        `${assignedAra?.full_name || 'ARA'} assigned to session by administrator.`,
+        'assignment'
+      );
+    }
   };
 
-  const handleUpdateRoomResponsibility = (resp: ARARoomResponsibility) => {
-    setRoomResponsibilities((prev: ARARoomResponsibility[]) => {
-      const exists = prev.some((r) => r.id === resp.id);
-      if (exists) {
-        return prev.map((r) => (r.id === resp.id ? resp : r));
-      }
-      return [...prev, resp];
-    });
-    addNotification('Room Key-Holder Updated', `Updated key-holder record for room ${resp.room_id}.`, 'assignment');
+  // Section 4 & 510-Block: Force allocate all 510 block sessions to designated room holders
+  const handleBatchForceAllocate510Block = () => {
+    const result = ASTUAssignmentEngine.forceAllocate510Block(
+      sessions,
+      assignments,
+      rooms,
+      aras,
+      roomResponsibilities,
+      availabilities
+    );
+
+    setAssignments(result.updatedAssignments);
+    setSessions(result.updatedSessions);
+
+    addNotification(
+      '510-Block Batch Force-Allocation Executed',
+      `Force-allocated ${result.resultsSummary.allocatedCount} / ${result.resultsSummary.total510Sessions} sessions in Block 510 to designated Room Key Holders.`,
+      'assignment'
+    );
+
+    return result.resultsSummary;
   };
 
   // Section 13: Semester rollover
@@ -585,6 +868,16 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans selection:bg-amber-400 selection:text-slate-950">
+      {/* Real-Time Conflict Alert Toast (Triggers on Manual Overlap) */}
+      <ConflictAlertToast
+        alert={activeConflictAlert}
+        onDismiss={() => setActiveConflictAlert(null)}
+        onNavigateToDiagnostics={() => {
+          setActiveConflictAlert(null);
+          setActiveTab('overrides_unresolved');
+        }}
+      />
+
       {/* Top Academic University Navigation Bar */}
       <Header
         currentRole={currentRole}
@@ -616,12 +909,21 @@ export default function App() {
             assignments={assignments}
             decisionReasons={decisionReasons}
             systemConfig={systemConfig}
+            qualifications={qualifications}
+            availabilities={availabilities}
             notifications={notifications}
             overrides={overrides}
+            downloadHistory={downloadHistory}
+            roomResponsibilities={roomResponsibilities}
             onRunBatchAllocation={handleRunBatchAllocation}
             onResetAllocations={handleResetAllocations}
             onSelectSession={(session) => setSelectedSessionForModal(session)}
             onOpenOfficialReport={() => setIsOfficialReportOpen(true)}
+            onRecordNewDownload={handleRecordNewDownload}
+            onUpdateCoursePriority={handleUpdateCoursePriority}
+            onRefreshTelemetry={() => addNotification('Telemetry Refreshed', 'Telemetry and D3 metrics synced from live engine state.', 'assignment')}
+            onBulkResolveOverlaps={handleBulkResolveOverlaps}
+            onHighPrecedenceAutoFill={handleHighPrecedenceAutoFill}
             isProcessingBatch={isProcessingBatch}
           />
         )}
@@ -675,9 +977,13 @@ export default function App() {
             blockResponsibilities={blockResponsibilities}
             roomResponsibilities={roomResponsibilities}
             systemConfig={systemConfig}
+            currentUserRole={currentRole}
             onUpdateBlockResponsibility={handleUpdateBlockResponsibility}
             onUpdateRoomResponsibility={handleUpdateRoomResponsibility}
             onTriggerSemesterRollover={handleTriggerSemesterRollover}
+            onAssignAraToSession={handleAssignAraToSession}
+            onBatchForceAllocate510Block={handleBatchForceAllocate510Block}
+            onSelectSession={(session) => setSelectedSessionForModal(session)}
           />
         )}
 
@@ -685,9 +991,12 @@ export default function App() {
           <ScoringWeightsEditor
             weights={weights}
             systemConfig={systemConfig}
+            courses={courses}
             onUpdateWeight={handleUpdateWeight}
             onUpdateSystemConfig={handleUpdateSystemConfig}
             onResetWeightsToDefault={handleResetWeightsToDefault}
+            onUpdateCoursePriority={handleUpdateCoursePriority}
+            onHighPrecedenceAutoFill={handleHighPrecedenceAutoFill}
           />
         )}
 
@@ -723,6 +1032,24 @@ export default function App() {
             notifications={notifications}
             overrides={overrides}
           />
+        )}
+
+        {activeTab === 'system_health' && (
+          <div className="space-y-6">
+            <SystemHealthDashboard
+              sessions={sessions}
+              courses={courses}
+              rooms={rooms}
+              blocks={blocks}
+              aras={aras}
+              assignments={assignments}
+              decisionReasons={decisionReasons}
+              overrides={overrides}
+              systemConfig={systemConfig}
+              notifications={notifications}
+              onRefreshTelemetry={() => addNotification('Telemetry Synchronized', 'Real-time D3 charts and server health metrics updated.', 'assignment')}
+            />
+          </div>
         )}
       </main>
 

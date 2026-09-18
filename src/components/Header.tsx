@@ -14,7 +14,10 @@ import {
   UserPlus,
   LogIn,
   Key,
-  User
+  User,
+  Sun,
+  Moon,
+  Activity
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -30,6 +33,8 @@ interface HeaderProps {
   onOpenQuickDemo: () => void;
   currentAra?: ARAUser;
   onOpenAuthModal: (mode: 'login' | 'register') => void;
+  isDarkMode?: boolean;
+  onToggleTheme?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -44,7 +49,9 @@ export const Header: React.FC<HeaderProps> = ({
   totalSessions,
   onOpenQuickDemo,
   currentAra,
-  onOpenAuthModal
+  onOpenAuthModal,
+  isDarkMode = false,
+  onToggleTheme
 }) => {
   const [showNotifs, setShowNotifs] = useState(false);
   const unreadCount = notifications.filter((n) => !n.is_read).length;
@@ -171,6 +178,32 @@ export const Header: React.FC<HeaderProps> = ({
               </option>
             </select>
           </div>
+
+          {/* Global Academic Theme Toggle Button (Light vs. High-Contrast Dark Academic) */}
+          {onToggleTheme && (
+            <button
+              onClick={onToggleTheme}
+              className={`p-2 rounded-lg border transition-all flex items-center gap-1.5 text-xs font-semibold ${
+                isDarkMode
+                  ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-sm hover:bg-amber-300'
+                  : 'bg-slate-800/90 text-amber-300 border-white/20 hover:bg-slate-700/90'
+              }`}
+              title={isDarkMode ? 'Switch to Light Academic Theme' : 'Switch to High-Contrast Dark Academic Theme'}
+              aria-label="Toggle Theme"
+            >
+              {isDarkMode ? (
+                <>
+                  <Sun className="w-4 h-4 text-slate-950 fill-slate-950" />
+                  <span className="hidden lg:inline text-[11px] font-bold">Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-amber-300 fill-amber-300/30" />
+                  <span className="hidden lg:inline text-[11px] font-bold">Dark</span>
+                </>
+              )}
+            </button>
+          )}
 
           {/* Notifications Center Toggle */}
           <div className="relative">
@@ -353,6 +386,18 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
             Audit Trail & SRS Checklist (§18)
+          </button>
+
+          <button
+            onClick={() => setActiveTab('system_health')}
+            className={`px-3 py-2 rounded-md font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+              activeTab === 'system_health'
+                ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
+                : 'text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Activity className="w-3.5 h-3.5 text-cyan-400" />
+            System Health (D3)
           </button>
         </div>
       </nav>

@@ -58,8 +58,11 @@ export const UNIVERSITY_BLOCKS: LaboratoryBlock[] = [
 
 export const UNIVERSITY_ROOMS: LaboratoryRoom[] = [
   // Block B-508
+  { id: 'room-508-09', block_id: 'block-508', room_code: 'Room 508-09', room_name: 'Applied Computing & Research Lab', capacity: 42, lab_type: 'Software', key_status: 'Available', status: 'Active' },
+  { id: 'room-508-10', block_id: 'block-508', room_code: 'Room 508-10', room_name: 'Computing & Simulation Lab', capacity: 40, lab_type: 'Software', key_status: 'Available', status: 'Active' },
   { id: 'room-508-11', block_id: 'block-508', room_code: 'Room 508-11', room_name: 'Embedded Systems & Hardware Lab', capacity: 40, lab_type: 'Hardware/Embedded', key_status: 'Available', status: 'Active' },
   { id: 'room-508-12', block_id: 'block-508', room_code: 'Room 508-12', room_name: 'Applied Computing Lab I', capacity: 42, lab_type: 'Software', key_status: 'Available', status: 'Active' },
+  { id: 'room-508-13', block_id: 'block-508', room_code: 'Room 508-13', room_name: 'Microprocessor & Systems Lab', capacity: 40, lab_type: 'Hardware/Embedded', key_status: 'Available', status: 'Active' },
   { id: 'room-508-14', block_id: 'block-508', room_code: 'Room 508-14', room_name: 'Algorithms & Computing Lab', capacity: 45, lab_type: 'Software', key_status: 'Available', status: 'Active' },
   { id: 'room-508-15', block_id: 'block-508', room_code: 'Room 508-15', room_name: 'Advanced Programming Lab A', capacity: 45, lab_type: 'Software', key_status: 'Available', status: 'Active' },
   { id: 'room-508-16', block_id: 'block-508', room_code: 'Room 508-16', room_name: 'High Performance Computing Lab', capacity: 38, lab_type: 'AI & Robotics', key_status: 'Available', status: 'Active' },
@@ -69,11 +72,14 @@ export const UNIVERSITY_ROOMS: LaboratoryRoom[] = [
   { id: 'room-509-02', block_id: 'block-509', room_code: 'Room 509-02', room_name: 'Networks & Communications Lab', capacity: 42, lab_type: 'Networking', key_status: 'Available', status: 'Active' },
   { id: 'room-509-03', block_id: 'block-509', room_code: 'Room 509-03', room_name: 'Operating Systems Lab', capacity: 45, lab_type: 'Software', key_status: 'Available', status: 'Active' },
   { id: 'room-509-04', block_id: 'block-509', room_code: 'Room 509-04', room_name: 'Information Security & Data Lab', capacity: 40, lab_type: 'Software', key_status: 'Available', status: 'Active' },
+  { id: 'room-509-05', block_id: 'block-509', room_code: 'Room 509-05', room_name: 'Advanced Networks & Systems Lab', capacity: 42, lab_type: 'Networking', key_status: 'Available', status: 'Active' },
   { id: 'room-509-06', block_id: 'block-509', room_code: 'Room 509-06', room_name: 'Web & Distributed Systems Lab', capacity: 42, lab_type: 'Software', key_status: 'Available', status: 'Active' },
   { id: 'room-509-07', block_id: 'block-509', room_code: 'Room 509-07', room_name: 'Systems Architecture Lab', capacity: 40, lab_type: 'Hardware/Embedded', key_status: 'Available', status: 'Active' },
   { id: 'room-509-08', block_id: 'block-509', room_code: 'Room 509-08', room_name: 'Multimedia Technologies Lab', capacity: 45, lab_type: 'Software', key_status: 'Available', status: 'Active' },
+  { id: 'room-509-09', block_id: 'block-509', room_code: 'Room 509-09', room_name: 'Database & Cloud Systems Lab', capacity: 40, lab_type: 'Software', key_status: 'Available', status: 'Active' },
 
   // Block B-510
+  { id: 'room-510-01', block_id: 'block-510', room_code: 'Room 510-01', room_name: 'Software Foundations Lab', capacity: 42, lab_type: 'Software', key_status: 'Available', status: 'Active' },
   { id: 'room-510-02', block_id: 'block-510', room_code: 'Room 510-02', room_name: 'Introductory Computing Lab A (LAB 1)', capacity: 45, lab_type: 'Software', key_status: 'Available', status: 'Active' },
   { id: 'room-510-03', block_id: 'block-510', room_code: 'Room 510-03', room_name: 'Programming & Data Structures Lab (LAB 2)', capacity: 45, lab_type: 'Software', key_status: 'Available', status: 'Active' },
   { id: 'room-510-04', block_id: 'block-510', room_code: 'Room 510-04', room_name: 'Database & Systems Lab (LAB 3)', capacity: 42, lab_type: 'Software', key_status: 'Available', status: 'Active' },
@@ -112,6 +118,11 @@ export const UNIVERSITY_COURSES: Course[] = [
     lecture_count: 38,
     lab_count: 76,
     has_lab: true,
+    priority_level: 'HIGH_ENROLLMENT',
+    precedence_score: 96,
+    required_ara_per_room: 2,
+    precedence_reason: 'Freshman massive enrollment foundation (38 sections); requires 2 ARAs per room to provide hands-on coding diagnostics.',
+    special_assistance_required: true,
   },
   {
     id: 'course-cseg1101-psci',
@@ -129,6 +140,11 @@ export const UNIVERSITY_COURSES: Course[] = [
     lecture_count: 4,
     lab_count: 8,
     has_lab: true,
+    priority_level: 'HIGH_ENROLLMENT',
+    precedence_score: 88,
+    required_ara_per_room: 1,
+    precedence_reason: 'Pre-science foundational computational reasoning lab.',
+    special_assistance_required: false,
   },
   {
     id: 'course-cseg2101',
@@ -146,6 +162,11 @@ export const UNIVERSITY_COURSES: Course[] = [
     lecture_count: 14,
     lab_count: 28,
     has_lab: true,
+    priority_level: 'CRITICAL_CORE',
+    precedence_score: 94,
+    required_ara_per_room: 1,
+    precedence_reason: 'Fundamental prerequisite programming course; heavy pointer debugging and algorithmic evaluation.',
+    special_assistance_required: true,
   },
   {
     id: 'course-cseg3201',
@@ -163,6 +184,11 @@ export const UNIVERSITY_COURSES: Course[] = [
     lecture_count: 3,
     lab_count: 6,
     has_lab: true,
+    priority_level: 'CRITICAL_CORE',
+    precedence_score: 90,
+    required_ara_per_room: 1,
+    precedence_reason: 'Multithreading and asynchronous systems programming in B-510 LAB 6.',
+    special_assistance_required: true,
   },
   {
     id: 'course-cseg3202',
@@ -180,6 +206,11 @@ export const UNIVERSITY_COURSES: Course[] = [
     lecture_count: 3,
     lab_count: 6,
     has_lab: true,
+    priority_level: 'HARDWARE_INTENSIVE',
+    precedence_score: 86,
+    required_ara_per_room: 1,
+    precedence_reason: 'Hardware simulation, assembly debugging, and cache optimization laboratory.',
+    special_assistance_required: false,
   },
   {
     id: 'course-cseg3203',
@@ -197,6 +228,11 @@ export const UNIVERSITY_COURSES: Course[] = [
     lecture_count: 3,
     lab_count: 6,
     has_lab: true,
+    priority_level: 'STANDARD',
+    precedence_score: 80,
+    required_ara_per_room: 1,
+    precedence_reason: 'Software architecture and component design.',
+    special_assistance_required: false,
   },
   {
     id: 'course-cseg3204',
@@ -214,6 +250,11 @@ export const UNIVERSITY_COURSES: Course[] = [
     lecture_count: 3,
     lab_count: 6,
     has_lab: true,
+    priority_level: 'HARDWARE_INTENSIVE',
+    precedence_score: 92,
+    required_ara_per_room: 2,
+    precedence_reason: 'Physical networking hardware, patch panels, Cisco routing protocols, and Wireshark inspection; requires 2 ARAs.',
+    special_assistance_required: true,
   },
   {
     id: 'course-cseg3303',
@@ -427,14 +468,19 @@ export const UNIVERSITY_COURSES: Course[] = [
     program: 'SE',
     year_level: 4,
     credit_hours: 1,
-    lab_session_duration_hours: 0,
+    lab_session_duration_hours: 2,
     level: 'Undergraduate',
-    syllabus_topic: 'Project definition, stakeholder analysis, project management plan',
-    activity_type: ['lecture'],
+    syllabus_topic: 'Project definition, stakeholder analysis, project management plan, and prototype supervision',
+    activity_type: ['lecture', 'laboratory'],
     sections_list: ['1', '2', '3'],
     lecture_count: 3,
-    lab_count: 0,
-    has_lab: false,
+    lab_count: 6,
+    has_lab: true,
+    priority_level: 'CRITICAL_CORE',
+    precedence_score: 95,
+    required_ara_per_room: 1,
+    precedence_reason: 'Capstone software engineering project definition and prototype laboratory defense.',
+    special_assistance_required: true,
   },
   {
     id: 'course-seng4207',
@@ -512,14 +558,19 @@ export const UNIVERSITY_COURSES: Course[] = [
     program: 'CSE',
     year_level: 5,
     credit_hours: 1,
-    lab_session_duration_hours: 0,
+    lab_session_duration_hours: 2,
     level: 'Undergraduate',
-    syllabus_topic: 'Engineering project formulation and prototype specifications',
-    activity_type: ['lecture'],
+    syllabus_topic: 'Engineering project formulation, prototype specifications, and laboratory execution',
+    activity_type: ['lecture', 'laboratory'],
     sections_list: ['1', '2', '3'],
     lecture_count: 3,
-    lab_count: 0,
-    has_lab: false,
+    lab_count: 6,
+    has_lab: true,
+    priority_level: 'CRITICAL_CORE',
+    precedence_score: 95,
+    required_ara_per_room: 1,
+    precedence_reason: 'CSE Capstone Project formulation and technical prototype supervision in B-510 laboratories.',
+    special_assistance_required: true,
   },
   {
     id: 'course-cseg5303',
@@ -597,14 +648,19 @@ export const UNIVERSITY_COURSES: Course[] = [
     program: 'SE',
     year_level: 5,
     credit_hours: 3,
-    lab_session_duration_hours: 0,
+    lab_session_duration_hours: 2,
     level: 'Undergraduate',
-    syllabus_topic: 'Senior graduation project implementation, defense and evaluation',
-    activity_type: ['project'],
+    syllabus_topic: 'Senior graduation project implementation, defense, laboratory prototyping and evaluation',
+    activity_type: ['project', 'laboratory'],
     sections_list: Array.from({ length: 30 }, (_, i) => `Group ${i + 1}`),
     lecture_count: 32,
-    lab_count: 0,
-    has_lab: false,
+    lab_count: 64,
+    has_lab: true,
+    priority_level: 'CRITICAL_CORE',
+    precedence_score: 98,
+    required_ara_per_room: 1,
+    precedence_reason: 'SE Senior graduation Final Year Project I prototyping, testing and evaluation in B-510/509/508 labs.',
+    special_assistance_required: true,
   },
   {
     id: 'course-cseg5203',
@@ -614,14 +670,19 @@ export const UNIVERSITY_COURSES: Course[] = [
     program: 'CSE',
     year_level: 5,
     credit_hours: 2,
-    lab_session_duration_hours: 0,
+    lab_session_duration_hours: 2,
     level: 'Undergraduate',
-    syllabus_topic: 'Capstone hardware/software system prototype engineering',
-    activity_type: ['project'],
+    syllabus_topic: 'Capstone hardware/software system prototype engineering and laboratory benchmarking',
+    activity_type: ['project', 'laboratory'],
     sections_list: Array.from({ length: 30 }, (_, i) => `Group ${i + 1}`),
     lecture_count: 40,
-    lab_count: 0,
-    has_lab: false,
+    lab_count: 60,
+    has_lab: true,
+    priority_level: 'CRITICAL_CORE',
+    precedence_score: 98,
+    required_ara_per_room: 1,
+    precedence_reason: 'CSE Senior graduation Final Year Project I system architecture and hardware/software laboratory prototyping.',
+    special_assistance_required: true,
   },
   // Benchmark reference course from SRS v2.0
   {
@@ -646,7 +707,7 @@ export const UNIVERSITY_COURSES: Course[] = [
 export const UNIVERSITY_ARAS: ARAUser[] = [
   {
     id: 'ara-ali',
-    ara_code: 'SARA/2026/01',
+    ara_code: 'ARA/2026/01',
     full_name: 'Ali Kibret Muhamed',
     email: 'alikibretmuhamed@gmail.com',
     phone: '0925594543',
@@ -660,12 +721,12 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     created_at: '2026-07-27T11:27:45Z',
     avatar_initials: 'AK',
     gpa_or_standing: '3.86 (High Honors)',
-    assigned_rooms_summary: 'B510 LAB 6 (Room Owner & Key Custodian), Room 510-08',
-    is_sara: true,
+    assigned_rooms_summary: 'Room 510-08, Room 509-09',
+    is_sara: false,
   },
   {
     id: 'ara-yohanes',
-    ara_code: 'SARA/2026/02',
+    ara_code: 'ARA/2026/02',
     full_name: 'Yohanes Alemu',
     email: 'yohanesalemu0069@gmail.com',
     phone: '0922802813',
@@ -680,7 +741,7 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     avatar_initials: 'YA',
     gpa_or_standing: '3.79 (Honors)',
     assigned_rooms_summary: 'Room 508-15, Room 508-16',
-    is_sara: true,
+    is_sara: false,
   },
   {
     id: 'ara-haimanot',
@@ -703,7 +764,7 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
   },
   {
     id: 'ara-shambel',
-    ara_code: 'SARA/2026/04',
+    ara_code: 'ARA/2026/04',
     full_name: 'Shambel Lemma Gadisa',
     email: 'shamlem94@gmail.com',
     phone: '0910081075',
@@ -718,11 +779,11 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     avatar_initials: 'SL',
     gpa_or_standing: '3.74 (Very Good)',
     assigned_rooms_summary: 'Room 508-11, Room 509-07',
-    is_sara: true,
+    is_sara: false,
   },
   {
     id: 'ara-birhanu-d',
-    ara_code: 'SARA/2026/05',
+    ara_code: 'ARA/2026/05',
     full_name: 'Birhanu Damessa',
     email: 'birhanudamessa1214@gmsil.com',
     phone: '0943161357',
@@ -736,8 +797,8 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     created_at: '2026-07-27T11:52:09Z',
     avatar_initials: 'BD',
     gpa_or_standing: '3.82 (High Honors)',
-    assigned_rooms_summary: 'Room 509-06',
-    is_sara: true,
+    assigned_rooms_summary: 'Room 509-06, B510 LAB 6',
+    is_sara: false,
   },
   {
     id: 'ara-mesay',
@@ -755,7 +816,7 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     created_at: '2026-07-27T12:00:10Z',
     avatar_initials: 'MS',
     gpa_or_standing: '3.78 (Honors)',
-    assigned_rooms_summary: 'Room 509-03',
+    assigned_rooms_summary: 'Room 509-03, Room 510-01',
     is_sara: true,
   },
   {
@@ -779,7 +840,7 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
   },
   {
     id: 'ara-ephrem',
-    ara_code: 'SARA/2026/08',
+    ara_code: 'ARA/2026/08',
     full_name: 'Ephrem Tesema',
     email: 'ephremtesema92@gmail.com',
     phone: '0983268896',
@@ -794,11 +855,11 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     avatar_initials: 'ET',
     gpa_or_standing: '3.88 (High Honors)',
     assigned_rooms_summary: 'Room 510-14, Room 510-15',
-    is_sara: true,
+    is_sara: false,
   },
   {
     id: 'ara-fanos',
-    ara_code: 'SARA/2026/09',
+    ara_code: 'ARA/2026/09',
     full_name: 'Fanos Hinika Haro',
     email: 'Fhinika9@gmail.com',
     phone: '0989096090',
@@ -813,11 +874,11 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     avatar_initials: 'FH',
     gpa_or_standing: '3.94 (Dean List)',
     assigned_rooms_summary: 'Room 510-03, Room 510-05',
-    is_sara: true,
+    is_sara: false,
   },
   {
     id: 'ara-fikadu',
-    ara_code: 'SARA/2026/10',
+    ara_code: 'ARA/2026/10',
     full_name: 'Fikadu Alemu',
     email: 'alemufikadu22@gmail.com',
     phone: '0910776333',
@@ -832,11 +893,11 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     avatar_initials: 'FA',
     gpa_or_standing: '3.76 (Very Good)',
     assigned_rooms_summary: 'Room 509-04, Room 510-12',
-    is_sara: true,
+    is_sara: false,
   },
   {
     id: 'ara-biruk',
-    ara_code: 'SARA/2026/11',
+    ara_code: 'ARA/2026/11',
     full_name: 'Biruk Tefera Hunde',
     email: 'birukteferahunde@gmail.com',
     phone: '0961951804',
@@ -850,8 +911,8 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     created_at: '2026-07-27T15:11:52Z',
     avatar_initials: 'BT',
     gpa_or_standing: '3.80 (Honors)',
-    assigned_rooms_summary: 'Room 510-16',
-    is_sara: true,
+    assigned_rooms_summary: 'Room 510-16, Room 508-09',
+    is_sara: false,
   },
   {
     id: 'ara-milki',
@@ -869,31 +930,12 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     created_at: '2026-07-27T15:14:16Z',
     avatar_initials: 'MM',
     gpa_or_standing: '3.87 (High Honors)',
-    assigned_rooms_summary: 'Room 509-01, Room 510-02',
-    is_sara: true,
-  },
-  {
-    id: 'ara-bezawit',
-    ara_code: 'SARA/2026/13',
-    full_name: 'Bezawit Girma',
-    email: 'girmabezawit054@gmail.com',
-    phone: '0949300956',
-    department: 'Software Engineering',
-    program: 'SE',
-    year_level: 4,
-    role: 'GENERAL_ARA',
-    status: 'Active',
-    max_weekly_hours: 12,
-    current_weekly_hours: 0,
-    created_at: '2026-07-27T15:21:35Z',
-    avatar_initials: 'BG',
-    gpa_or_standing: '3.92 (Dean List)',
-    assigned_rooms_summary: 'General Allocation Pool',
+    assigned_rooms_summary: 'Room 510-02, Room 509-01',
     is_sara: true,
   },
   {
     id: 'ara-kebede',
-    ara_code: 'SARA/2026/14',
+    ara_code: 'SARA/2026/13',
     full_name: 'Kebede Tegene Alemu',
     email: 'kabetagane22@gmail.com',
     phone: '0921709996',
@@ -907,12 +949,31 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     created_at: '2026-07-27T15:22:07Z',
     avatar_initials: 'KT',
     gpa_or_standing: '3.75 (Very Good)',
-    assigned_rooms_summary: 'Room 510-13',
+    assigned_rooms_summary: 'Room 510-13, Room 508-13',
     is_sara: true,
   },
   {
+    id: 'ara-bezawit',
+    ara_code: 'ARA/2026/14',
+    full_name: 'Bezawit Girma',
+    email: 'girmabezawit054@gmail.com',
+    phone: '0949300956',
+    department: 'Software Engineering',
+    program: 'SE',
+    year_level: 4,
+    role: 'ROOM_KEY_HOLDER',
+    status: 'Active',
+    max_weekly_hours: 12,
+    current_weekly_hours: 0,
+    created_at: '2026-07-27T15:21:35Z',
+    avatar_initials: 'BG',
+    gpa_or_standing: '3.92 (Dean List)',
+    assigned_rooms_summary: 'Room 508-10',
+    is_sara: false,
+  },
+  {
     id: 'ara-regesa',
-    ara_code: 'SARA/2026/15',
+    ara_code: 'ARA/2026/15',
     full_name: 'Regesa Tesema',
     email: 'Raggaasaat@gmail.com',
     phone: '0912869438',
@@ -927,12 +988,12 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     avatar_initials: 'RT',
     gpa_or_standing: '3.84 (High Honors)',
     assigned_rooms_summary: 'Room 510-17',
-    is_sara: true,
+    is_sara: false,
   },
   {
     id: 'ara-berhanu-e',
     ara_code: 'SARA/2026/16',
-    full_name: 'Berhanu Endesha',
+    full_name: 'Berhanu Endashaw',
     email: 'Berhanuendesha28@gmail.com',
     phone: '0920617240',
     department: 'Computer Science & Engineering',
@@ -945,7 +1006,26 @@ export const UNIVERSITY_ARAS: ARAUser[] = [
     created_at: '2026-07-27T15:45:41Z',
     avatar_initials: 'BE',
     gpa_or_standing: '3.89 (High Honors)',
-    assigned_rooms_summary: 'Room 508-14, Room 510-04',
+    assigned_rooms_summary: 'Room 510-04, Room 508-14',
+    is_sara: true,
+  },
+  {
+    id: 'ara-tamirat',
+    ara_code: 'SARA/2026/17',
+    full_name: 'Tamirat Alemu',
+    email: 'tamirat.alemu@gmail.com',
+    phone: '0911543210',
+    department: 'Computer Science & Engineering',
+    program: 'CSE',
+    year_level: 4,
+    role: 'ROOM_KEY_HOLDER',
+    status: 'Active',
+    max_weekly_hours: 12,
+    current_weekly_hours: 0,
+    created_at: '2026-07-27T16:00:00Z',
+    avatar_initials: 'TA',
+    gpa_or_standing: '3.83 (High Honors)',
+    assigned_rooms_summary: 'Room 509-05',
     is_sara: true,
   },
   // Retained for Section 20 Benchmark compliance
@@ -1013,46 +1093,70 @@ export const UNIVERSITY_BLOCK_RESPONSIBILITIES: ARABlockResponsibility[] = [
 ];
 
 export const UNIVERSITY_ROOM_RESPONSIBILITIES: ARARoomResponsibility[] = [
-  // Ali Kibret Muhamed -> B510 LAB 6 (Room Key Custodian / Responsible ARA) & Room 510-08
-  { id: 'rr-ali-b510-lab6', room_id: 'room-510-06', ara_id: 'ara-ali', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  { id: 'rr-ali-1', room_id: 'room-510-08', ara_id: 'ara-ali', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Yohanes Alemu -> Room 508-15, Room 508-16
-  { id: 'rr-yoh-1', room_id: 'room-508-15', ara_id: 'ara-yohanes', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+  // 1. Ali Kibret Muhamed -> Room 510-08, Room 509-09
+  { id: 'rr-ali-1', room_id: 'room-510-08', ara_id: 'ara-ali', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+  { id: 'rr-ali-2', room_id: 'room-509-09', ara_id: 'ara-ali', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 2. Yohanes Alemu -> Room 508-15, Room 508-16
+  { id: 'rr-yoh-1', room_id: 'room-508-15', ara_id: 'ara-yohanes', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
   { id: 'rr-yoh-2', room_id: 'room-508-16', ara_id: 'ara-yohanes', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Haimanot Kiber -> Room 508-12, Room 509-08
-  { id: 'rr-hai-1', room_id: 'room-508-12', ara_id: 'ara-haimanot', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 3. Haimanot Kiber Temesgen (SARA) -> Room 508-12, Room 509-08
+  { id: 'rr-hai-1', room_id: 'room-508-12', ara_id: 'ara-haimanot', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
   { id: 'rr-hai-2', room_id: 'room-509-08', ara_id: 'ara-haimanot', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Shambel Lemma -> Room 508-11, Room 509-07
-  { id: 'rr-sha-1', room_id: 'room-508-11', ara_id: 'ara-shambel', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 4. Shambel Lemma Gadisa -> Room 508-11, Room 509-07
+  { id: 'rr-sha-1', room_id: 'room-508-11', ara_id: 'ara-shambel', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
   { id: 'rr-sha-2', room_id: 'room-509-07', ara_id: 'ara-shambel', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Birhanu Damessa -> Room 509-06
-  { id: 'rr-bir-1', room_id: 'room-509-06', ara_id: 'ara-birhanu-d', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Mesay Shemsu -> Room 509-03
-  { id: 'rr-mes-1', room_id: 'room-509-03', ara_id: 'ara-mesay', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Hachalu Bekele -> Room 509-02, Room 510-11
-  { id: 'rr-hac-1', room_id: 'room-509-02', ara_id: 'ara-hachalu', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 5. Birhanu Damessa -> Room 509-06, Room 510-06 (B510 LAB 6)
+  { id: 'rr-bir-1', room_id: 'room-509-06', ara_id: 'ara-birhanu-d', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+  { id: 'rr-bir-2', room_id: 'room-510-06', ara_id: 'ara-birhanu-d', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 6. Mesay Shemsu Jemal (SARA) -> Room 509-03, Room 510-01
+  { id: 'rr-mes-1', room_id: 'room-509-03', ara_id: 'ara-mesay', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+  { id: 'rr-mes-2', room_id: 'room-510-01', ara_id: 'ara-mesay', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 7. Hachalu Bekele Gadefa (SARA) -> Room 509-02, Room 510-11
+  { id: 'rr-hac-1', room_id: 'room-509-02', ara_id: 'ara-hachalu', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
   { id: 'rr-hac-2', room_id: 'room-510-11', ara_id: 'ara-hachalu', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Ephrem Tesema -> Room 510-14, Room 510-15
-  { id: 'rr-eph-1', room_id: 'room-510-14', ara_id: 'ara-ephrem', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 8. Ephrem Tesema -> Room 510-14, Room 510-15
+  { id: 'rr-eph-1', room_id: 'room-510-14', ara_id: 'ara-ephrem', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
   { id: 'rr-eph-2', room_id: 'room-510-15', ara_id: 'ara-ephrem', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Fanos Hinika -> Room 510-03, Room 510-05
-  { id: 'rr-fan-1', room_id: 'room-510-03', ara_id: 'ara-fanos', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 9. Fanos Hinika Haro -> Room 510-03, Room 510-05
+  { id: 'rr-fan-1', room_id: 'room-510-03', ara_id: 'ara-fanos', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
   { id: 'rr-fan-2', room_id: 'room-510-05', ara_id: 'ara-fanos', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Fikadu Alemu -> Room 509-04, Room 510-12
-  { id: 'rr-fik-1', room_id: 'room-509-04', ara_id: 'ara-fikadu', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 10. Fikadu Alemu -> Room 509-04, Room 510-12
+  { id: 'rr-fik-1', room_id: 'room-509-04', ara_id: 'ara-fikadu', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
   { id: 'rr-fik-2', room_id: 'room-510-12', ara_id: 'ara-fikadu', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Biruk Tefera Hunde -> Room 510-16
-  { id: 'rr-brk-1', room_id: 'room-510-16', ara_id: 'ara-biruk', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Milki Muleta -> Room 509-01, Room 510-02
-  { id: 'rr-mlk-1', room_id: 'room-509-01', ara_id: 'ara-milki', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  { id: 'rr-mlk-2', room_id: 'room-510-02', ara_id: 'ara-milki', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Kebede Tegene -> Room 510-13
-  { id: 'rr-keb-1', room_id: 'room-510-13', ara_id: 'ara-kebede', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Regesa Tesema -> Room 510-17
-  { id: 'rr-reg-1', room_id: 'room-510-17', ara_id: 'ara-regesa', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  // Berhanu Endesha -> Room 508-14, Room 510-04
-  { id: 'rr-bnd-1', room_id: 'room-508-14', ara_id: 'ara-berhanu-e', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
-  { id: 'rr-bnd-2', room_id: 'room-510-04', ara_id: 'ara-berhanu-e', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 11. Biruk Tefera Hunde -> Room 510-16, Room 508-09
+  { id: 'rr-brk-1', room_id: 'room-510-16', ara_id: 'ara-biruk', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+  { id: 'rr-brk-2', room_id: 'room-508-09', ara_id: 'ara-biruk', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 12. Milki Muleta (SARA) -> Room 510-02, Room 509-01
+  { id: 'rr-mlk-1', room_id: 'room-510-02', ara_id: 'ara-milki', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+  { id: 'rr-mlk-2', room_id: 'room-509-01', ara_id: 'ara-milki', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 13. Kebede Tegene Alemu (SARA) -> Room 510-13, Room 508-13
+  { id: 'rr-keb-1', room_id: 'room-510-13', ara_id: 'ara-kebede', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+  { id: 'rr-keb-2', room_id: 'room-508-13', ara_id: 'ara-kebede', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 14. Bezawit Girma -> Room 508-10
+  { id: 'rr-bg-1', room_id: 'room-508-10', ara_id: 'ara-bezawit', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 15. Regesa Tesema -> Room 510-17
+  { id: 'rr-reg-1', room_id: 'room-510-17', ara_id: 'ara-regesa', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 16. Berhanu Endashaw (SARA) -> Room 510-04, Room 508-14
+  { id: 'rr-bnd-1', room_id: 'room-510-04', ara_id: 'ara-berhanu-e', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+  { id: 'rr-bnd-2', room_id: 'room-508-14', ara_id: 'ara-berhanu-e', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: false, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
+
+  // 17. Tamirat Alemu (SARA) -> Room 509-05
+  { id: 'rr-tam-1', room_id: 'room-509-05', ara_id: 'ara-tamirat', responsibility_type: 'ROOM_KEY_HOLDER', is_primary: true, is_mandatory: true, start_date: '2026-09-01', end_date: '2027-02-15', academic_year: '2026/2027', semester: 'Semester I', status: 'Active' },
 ];
 
 export const UNIVERSITY_QUALIFICATIONS: ARAQualification[] = [
@@ -1109,25 +1213,50 @@ export const UNIVERSITY_QUALIFICATIONS: ARAQualification[] = [
   { id: 'uq-mlk-1', ara_id: 'ara-milki', course_id: 'course-cseg1101-peng', qualified_date: '2025-09-10', expiry_date: null, status: 'Valid', certified_by: 'ASTU CSEg Dept' },
   { id: 'uq-mlk-2', ara_id: 'ara-milki', course_id: 'course-cseg2101', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU CSEg Dept' },
 
-  // Bezawit Girma: CSEg1101, SEng2206, CSEg3203, CSEg4201
-  { id: 'uq-bg-1', ara_id: 'ara-bezawit', course_id: 'course-cseg1101-peng', qualified_date: '2025-09-10', expiry_date: null, status: 'Valid', certified_by: 'ASTU SE Dept' },
-  { id: 'uq-bg-2', ara_id: 'ara-bezawit', course_id: 'course-seng2206', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SE Dept' },
-
   // Kebede Tegene: CSEg1101, CSEg4207
   { id: 'uq-keb-1', ara_id: 'ara-kebede', course_id: 'course-cseg1101-peng', qualified_date: '2025-09-10', expiry_date: null, status: 'Valid', certified_by: 'ASTU CSEg Dept' },
   { id: 'uq-keb-2', ara_id: 'ara-kebede', course_id: 'course-cseg4207', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU CSEg Dept' },
+
+  // Bezawit Girma: CSEg1101, SEng2206, CSEg3203, CSEg4201
+  { id: 'uq-bg-1', ara_id: 'ara-bezawit', course_id: 'course-cseg1101-peng', qualified_date: '2025-09-10', expiry_date: null, status: 'Valid', certified_by: 'ASTU SE Dept' },
+  { id: 'uq-bg-2', ara_id: 'ara-bezawit', course_id: 'course-seng2206', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SE Dept' },
 
   // Regesa Tesema: CSEg1101, CSEg5307, CSEg3204
   { id: 'uq-reg-1', ara_id: 'ara-regesa', course_id: 'course-cseg1101-peng', qualified_date: '2025-09-10', expiry_date: null, status: 'Valid', certified_by: 'ASTU CSEg Dept' },
   { id: 'uq-reg-2', ara_id: 'ara-regesa', course_id: 'course-cseg5307', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU CSEg Dept' },
 
-  // Berhanu Endesha: CSEg1101, CSEg2101, CSEg3201
+  // Berhanu Endashaw: CSEg1101, CSEg2101, CSEg3201
   { id: 'uq-bnd-1', ara_id: 'ara-berhanu-e', course_id: 'course-cseg1101-peng', qualified_date: '2025-09-10', expiry_date: null, status: 'Valid', certified_by: 'ASTU CSEg Dept' },
   { id: 'uq-bnd-2', ara_id: 'ara-berhanu-e', course_id: 'course-cseg2101', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU CSEg Dept' },
+
+  // Tamirat Alemu: CSEg1101, CSEg3204, CSEg5307
+  { id: 'uq-tam-1', ara_id: 'ara-tamirat', course_id: 'course-cseg1101-peng', qualified_date: '2025-09-10', expiry_date: null, status: 'Valid', certified_by: 'ASTU CSEg Dept' },
+  { id: 'uq-tam-2', ara_id: 'ara-tamirat', course_id: 'course-cseg3204', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU CSEg Dept' },
 
   // Abebe Kebede: CSEg 1104, CSEg 1101
   { id: 'uq-abe-1', ara_id: 'ara-001', course_id: 'course-cseg1104', qualified_date: '2023-09-15', expiry_date: null, status: 'Valid', certified_by: 'ASTU CSEg Dept' },
   { id: 'uq-abe-2', ara_id: 'ara-001', course_id: 'course-cseg1101-peng', qualified_date: '2024-09-15', expiry_date: null, status: 'Valid', certified_by: 'ASTU CSEg Dept' },
+
+  // Senior Capstone & Final Year Project I Qualifications (Certified for Year 4/5 ARAs/SARAs)
+  { id: 'uq-cap-ali-1', ara_id: 'ara-ali', course_id: 'course-cseg5203', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-ali-2', ara_id: 'ara-ali', course_id: 'course-cseg5213', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-yoh-1', ara_id: 'ara-yohanes', course_id: 'course-seng5201', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-yoh-2', ara_id: 'ara-yohanes', course_id: 'course-seng4203', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-hai-1', ara_id: 'ara-haimanot', course_id: 'course-seng5201', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-sha-1', ara_id: 'ara-shambel', course_id: 'course-cseg5203', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-bir-1', ara_id: 'ara-birhanu-d', course_id: 'course-cseg5203', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-mes-1', ara_id: 'ara-mesay', course_id: 'course-seng5201', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-hac-1', ara_id: 'ara-hachalu', course_id: 'course-seng5201', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-eph-1', ara_id: 'ara-ephrem', course_id: 'course-cseg5203', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-fan-1', ara_id: 'ara-fanos', course_id: 'course-cseg5203', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-fik-1', ara_id: 'ara-fikadu', course_id: 'course-cseg5213', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-brk-1', ara_id: 'ara-biruk', course_id: 'course-seng4203', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-mlk-1', ara_id: 'ara-milki', course_id: 'course-cseg5213', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-keb-1', ara_id: 'ara-kebede', course_id: 'course-cseg5203', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-bg-1', ara_id: 'ara-bezawit', course_id: 'course-seng4203', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-reg-1', ara_id: 'ara-regesa', course_id: 'course-cseg5213', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-bnd-1', ara_id: 'ara-berhanu-e', course_id: 'course-seng4203', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
+  { id: 'uq-cap-tam-1', ara_id: 'ara-tamirat', course_id: 'course-seng5201', qualified_date: '2026-02-01', expiry_date: null, status: 'Valid', certified_by: 'ASTU SOEEC Dept' },
 ];
 
 export const UNIVERSITY_AVAILABILITIES: AssistantAvailability[] = [
@@ -1181,21 +1310,26 @@ export const UNIVERSITY_AVAILABILITIES: AssistantAvailability[] = [
   { id: 'av-mlk-1', ara_id: 'ara-milki', day_of_week: 'Wednesday', start_time: '08:00', end_time: '12:00', is_available: true },
   { id: 'av-mlk-2', ara_id: 'ara-milki', day_of_week: 'Friday', start_time: '13:00', end_time: '17:00', is_available: true },
 
-  // Bezawit Girma
-  { id: 'av-bg-1', ara_id: 'ara-bezawit', day_of_week: 'Monday', start_time: '08:00', end_time: '17:00', is_available: true },
-  { id: 'av-bg-2', ara_id: 'ara-bezawit', day_of_week: 'Tuesday', start_time: '08:00', end_time: '17:00', is_available: true },
-
   // Kebede Tegene
   { id: 'av-keb-1', ara_id: 'ara-kebede', day_of_week: 'Tuesday', start_time: '08:00', end_time: '12:00', is_available: true },
   { id: 'av-keb-2', ara_id: 'ara-kebede', day_of_week: 'Thursday', start_time: '08:00', end_time: '12:00', is_available: true },
+
+  // Bezawit Girma
+  { id: 'av-bg-1', ara_id: 'ara-bezawit', day_of_week: 'Monday', start_time: '08:00', end_time: '17:00', is_available: true },
+  { id: 'av-bg-2', ara_id: 'ara-bezawit', day_of_week: 'Tuesday', start_time: '08:00', end_time: '17:00', is_available: true },
 
   // Regesa Tesema
   { id: 'av-reg-1', ara_id: 'ara-regesa', day_of_week: 'Monday', start_time: '13:00', end_time: '17:00', is_available: true },
   { id: 'av-reg-2', ara_id: 'ara-regesa', day_of_week: 'Wednesday', start_time: '13:00', end_time: '17:00', is_available: true },
 
-  // Berhanu Endesha
+  // Berhanu Endashaw
   { id: 'av-bnd-1', ara_id: 'ara-berhanu-e', day_of_week: 'Tuesday', start_time: '08:00', end_time: '12:00', is_available: true },
   { id: 'av-bnd-2', ara_id: 'ara-berhanu-e', day_of_week: 'Thursday', start_time: '13:00', end_time: '17:00', is_available: true },
+
+  // Tamirat Alemu
+  { id: 'av-tam-1', ara_id: 'ara-tamirat', day_of_week: 'Monday', start_time: '08:00', end_time: '12:00', is_available: true },
+  { id: 'av-tam-2', ara_id: 'ara-tamirat', day_of_week: 'Wednesday', start_time: '13:00', end_time: '17:00', is_available: true },
+  { id: 'av-tam-3', ara_id: 'ara-tamirat', day_of_week: 'Thursday', start_time: '08:00', end_time: '12:00', is_available: true },
 
   // Abebe Kebede
   { id: 'av-abe-1', ara_id: 'ara-001', day_of_week: 'Monday', start_time: '08:00', end_time: '13:00', is_available: true },
@@ -1604,5 +1738,218 @@ export const UNIVERSITY_SCHEDULED_SESSIONS: ScheduledSession[] = [
     semester: 'Semester I',
     status: 'Unassigned',
     notes: 'CSE Year 5 Advanced Networking Lab in Room 510-17.',
+  },
+  // CSEg1101 (PEng) in Room 510-01 (Mesay Shemsu Jemal is Key Holder)
+  {
+    id: 'sess-cseg1101-510-01',
+    course_id: 'course-cseg1101-peng',
+    room_id: 'room-510-01',
+    section: 'Section 5',
+    group: 'Lab Group A',
+    day_of_week: 'Wednesday',
+    start_time: '08:30',
+    end_time: '10:30',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: 'PEng Programming Lab in Software Foundations Lab Room 510-01 (Mesay Shemsu Key Holder).',
+  },
+  // CSEg1101 (PEng) in Room 510-02 (Milki Muleta is Key Holder)
+  {
+    id: 'sess-cseg1101-510-02',
+    course_id: 'course-cseg1101-peng',
+    room_id: 'room-510-02',
+    section: 'Section 6',
+    group: 'Lab Group A',
+    day_of_week: 'Friday',
+    start_time: '13:30',
+    end_time: '15:30',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: 'PEng Introductory Computing Lab in Room 510-02 (Milki Muleta Key Holder).',
+  },
+  // CSEg2101 (Data Structures) in Room 510-04 (Berhanu Endashaw is Key Holder)
+  {
+    id: 'sess-cseg2101-510-04',
+    course_id: 'course-cseg2101',
+    room_id: 'room-510-04',
+    section: 'Section 3',
+    group: 'Lab Group A',
+    day_of_week: 'Tuesday',
+    start_time: '09:00',
+    end_time: '11:00',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: 'CSE Year 2 Data Structures Lab in Database & Systems Lab Room 510-04 (Berhanu Endashaw Key Holder).',
+  },
+  // CSEg3203 (Advanced Programming - SE) in B510 LAB 6 (Birhanu Damessa is Key Holder)
+  {
+    id: 'sess-cseg3203-510-06',
+    course_id: 'course-cseg3203',
+    room_id: 'room-510-06',
+    section: 'Section 2',
+    group: 'Lab Group 1',
+    day_of_week: 'Friday',
+    start_time: '09:00',
+    end_time: '11:00',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: 'SE Year 3 Advanced Programming Lab in B-510 LAB 6 (Birhanu Damessa Key Holder).',
+  },
+  // Capstone Project & Final Year Project I Lab Supervision Sessions in Block 510 & 508/509
+  {
+    id: 'sess-fyp1-cseg5203-510-08',
+    course_id: 'course-cseg5203',
+    room_id: 'room-510-08',
+    section: 'Section Group 17',
+    group: 'Project Team Alpha',
+    day_of_week: 'Thursday',
+    start_time: '08:30',
+    end_time: '10:30',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: '5th Year CSE Final Year Project I Lab Supervision in Room 510-08 (Ali Kibret Key Holder).',
+  },
+  {
+    id: 'sess-fyp1-seng5201-508-15',
+    course_id: 'course-seng5201',
+    room_id: 'room-508-15',
+    section: 'Section Group 11',
+    group: 'Project Team Beta',
+    day_of_week: 'Monday',
+    start_time: '13:30',
+    end_time: '15:30',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: '5th Year SE Final Year Project I Lab Supervision in Room 508-15 (Yohanes Alemu Key Holder).',
+  },
+  {
+    id: 'sess-capstone-cseg5213-510-12',
+    course_id: 'course-cseg5213',
+    room_id: 'room-510-12',
+    section: 'Section 1',
+    group: 'Capstone Team 1',
+    day_of_week: 'Tuesday',
+    start_time: '13:30',
+    end_time: '15:30',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: '5th Year CSE Capstone Project Prototype Lab in Room 510-12 (Fikadu Alemu Key Holder).',
+  },
+  {
+    id: 'sess-capstone-seng4203-510-16',
+    course_id: 'course-seng4203',
+    room_id: 'room-510-16',
+    section: 'Section 1',
+    group: 'Capstone Team 2',
+    day_of_week: 'Monday',
+    start_time: '13:30',
+    end_time: '15:30',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: '4th Year SE Capstone Project Architecture Lab in Room 510-16 (Biruk Tefera Key Holder).',
+  },
+  {
+    id: 'sess-fyp1-seng5201-509-03',
+    course_id: 'course-seng5201',
+    room_id: 'room-509-03',
+    section: 'Section Group 3',
+    group: 'Project Team Gamma',
+    day_of_week: 'Wednesday',
+    start_time: '08:30',
+    end_time: '10:30',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: '5th Year SE Final Year Project I Lab Supervision in Room 509-03 (Mesay Shemsu Key Holder).',
+  },
+  {
+    id: 'sess-cseg3204-510-11',
+    course_id: 'course-cseg3204',
+    room_id: 'room-510-11',
+    section: 'Section 2',
+    group: 'Lab Group A',
+    day_of_week: 'Monday',
+    start_time: '10:30',
+    end_time: '12:30',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: 'Data Communication & Networks Lab in Room 510-11 (Hachalu Bekele Key Holder).',
+  },
+  {
+    id: 'sess-cseg4207-510-13',
+    course_id: 'course-cseg4207',
+    room_id: 'room-510-13',
+    section: 'Section 2',
+    group: 'Lab Group A',
+    day_of_week: 'Thursday',
+    start_time: '08:30',
+    end_time: '10:30',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: 'Microcomputer & Interfacing Lab in Room 510-13 (Kebede Tegne Key Holder).',
+  },
+  {
+    id: 'sess-cseg4301-510-14',
+    course_id: 'course-cseg4301',
+    room_id: 'room-510-14',
+    section: 'Section 1',
+    group: 'Lab Group A',
+    day_of_week: 'Tuesday',
+    start_time: '08:30',
+    end_time: '10:30',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: 'Data Mining Lab in Room 510-14 (Ephrem Tesema Key Holder).',
+  },
+  {
+    id: 'sess-cseg4303-510-15',
+    course_id: 'course-cseg4303',
+    room_id: 'room-510-15',
+    section: 'Section 1',
+    group: 'Lab Group A',
+    day_of_week: 'Thursday',
+    start_time: '08:30',
+    end_time: '10:30',
+    duration_hours: 2,
+    required_ara_count: 1,
+    academic_year: '2026/2027',
+    semester: 'Semester I',
+    status: 'Unassigned',
+    notes: 'Systems Programming Lab in Room 510-15 (Ephrem Tesema Key Holder).',
   },
 ];

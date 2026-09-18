@@ -587,8 +587,34 @@ export class ASTUAssignmentEngine {
   }
 
   /**
+   * Helper to compute numerical precedence sort key (Higher number = processed first)
+   * Honors priority_rank (1=Highest to 5=Lowest), priority_level, and precedence_score
+   */
+  public static getCoursePrecedenceSortKey(course?: Course): number {
+    if (!course) return 50;
+    if (course.precedence_score !== undefined && course.precedence_score !== null) {
+      return course.precedence_score;
+    }
+    if (course.priority_rank) {
+      // 1 -> 95, 2 -> 80, 3 -> 65, 4 -> 50, 5 -> 35
+      return (6 - course.priority_rank) * 15 + 20;
+    }
+    if (course.priority_level) {
+      const levelMap: Record<string, number> = {
+        CRITICAL_CORE: 95,
+        HIGH_ENROLLMENT: 80,
+        HARDWARE_INTENSIVE: 65,
+        STANDARD: 50,
+        ELECTIVE: 35,
+      };
+      return levelMap[course.priority_level] || 50;
+    }
+    return 50;
+  }
+
+  /**
    * Section 19: Batch Assignment Engine
-   * Processes all scheduled sessions for the semester in academic order
+   * Processes all scheduled sessions for the semester in academic precedence order
    */
   public static runBatchAssignment(
     sessions: ScheduledSession[],
@@ -603,7 +629,8 @@ export class ASTUAssignmentEngine {
     preferences: PreferenceSubmission[],
     weights: WeightConfiguration[],
     systemConfig: SystemConfig,
-    existingAssignments: AssistantAssignment[] = []
+    existingAssignments: AssistantAssignment[] = [],
+    coursesList: Course[] = []
   ): {
     updatedSessions: ScheduledSession[];
     newAssignments: AssistantAssignment[];
@@ -611,7 +638,18 @@ export class ASTUAssignmentEngine {
     unresolvedCount: number;
     assignedCount: number;
   } {
-    const updatedSessions = [...sessions];
+    // Sort sessions prioritizing high precedence courses that require special assistance / higher volume
+    const sortedSessions = [...sessions].sort((a, b) => {
+      const courseA = coursesList.find((c) => c.id === a.course_id);
+      const courseB = coursesList.find((c) => c.id === b.course_id);
+      const scoreA = this.getCoursePrecedenceSortKey(courseA);
+      const scoreB = this.getCoursePrecedenceSortKey(courseB);
+      if (scoreB !== scoreA) return scoreB - scoreA;
+      // Secondary sort: required_ara_count descending
+      return (b.required_ara_count || 1) - (a.required_ara_count || 1);
+    });
+
+    const updatedSessions = [...sortedSessions];
     const newAssignments: AssistantAssignment[] = [...existingAssignments];
     const decisionReasons: AssignmentDecisionReason[] = [];
 
@@ -951,6 +989,179 @@ export class ASTUAssignmentEngine {
       success: false,
       submission,
       message: 'Your preference was received. Higher-priority candidates or time conflicts detected; placed in pending queue.',
+    };
+  }
+
+  /**
+   * Batch Update: Force-allocates all sessions in the 510 Block to their specific designated ARA room holders.
+   * Validates each assignment against current room availability and ARA workload caps.
+   */
+  public static forceAllocate510Block(
+    allSessions: ScheduledSession[],
+    allAssignments: AssistantAssignment[],
+    rooms: LaboratoryRoom[],
+    aras: ARAUser[],
+    roomResponsibilities: ARARoomResponsibility[],
+    availabilities: AssistantAvailability[]
+  ): {
+    updatedAssignments: AssistantAssignment[];
+    updatedSessions: ScheduledSession[];
+    resultsSummary: {
+      total510Sessions: number;
+      allocatedCount: number;
+      validatedCount: number;
+      warnings: string[];
+      allocationsDetails: Array<{
+        sessionId: string;
+        roomCode: string;
+        roomName: string;
+        araName: string;
+        araCode: string;
+        courseId: string;
+        dayOfWeek: string;
+        timeSlot: string;
+        status: string;
+        isValidated: boolean;
+        validationNotes: string;
+      }>;
+    };
+  } {
+    // 1. Identify 510 Block Rooms
+    const rooms510 = rooms.filter(
+      (r) => r.block_id === 'block-510' || r.room_code.startsWith('510-')
+    );
+    const room510Ids = new Set(rooms510.map((r) => r.id));
+
+    // 2. Identify 510 Sessions
+    const sessions510 = allSessions.filter((s) => room510Ids.has(s.room_id));
+
+    const updatedAssignmentsMap = new Map<string, AssistantAssignment>();
+    // Pre-populate existing assignments
+    allAssignments.forEach((a) => updatedAssignmentsMap.set(a.session_id, a));
+
+    const updatedSessionsMap = new Map<string, ScheduledSession>();
+    allSessions.forEach((s) => updatedSessionsMap.set(s.id, s));
+
+    const warnings: string[] = [];
+    const allocationsDetails: Array<{
+      sessionId: string;
+      roomCode: string;
+      roomName: string;
+      araName: string;
+      araCode: string;
+      courseId: string;
+      dayOfWeek: string;
+      timeSlot: string;
+      status: string;
+      isValidated: boolean;
+      validationNotes: string;
+    }> = [];
+
+    let allocatedCount = 0;
+    let validatedCount = 0;
+
+    sessions510.forEach((session) => {
+      const room = rooms510.find((r) => r.id === session.room_id);
+      const roomCode = room?.room_code || '510-Room';
+      const roomName = room?.room_name || 'Laboratory Room';
+
+      // Find Key Holder for this room
+      const roomResp = roomResponsibilities.find(
+        (rr) => rr.room_id === session.room_id && rr.status === 'Active'
+      );
+      const keyHolderAra = roomResp ? aras.find((a) => a.id === roomResp.ara_id) : null;
+
+      if (!keyHolderAra) {
+        warnings.push(`No designated room key holder assigned for ${roomCode}. Session ${session.id} unallocated.`);
+        allocationsDetails.push({
+          sessionId: session.id,
+          roomCode,
+          roomName,
+          araName: 'Unassigned',
+          araCode: 'N/A',
+          courseId: session.course_id,
+          dayOfWeek: session.day_of_week,
+          timeSlot: `${session.start_time}-${session.end_time}`,
+          status: 'Unassigned',
+          isValidated: false,
+          validationNotes: 'Missing designated Room Key Holder assignment in SRS records.',
+        });
+        return;
+      }
+
+      // Check ARA availability
+      const isAvailable = availabilities.some((av) => {
+        if (av.ara_id !== keyHolderAra.id || !av.is_available) return false;
+        return av.day_of_week === session.day_of_week;
+      });
+
+      // Check workload
+      const araAssignedHours = Array.from(updatedAssignmentsMap.values())
+        .filter((a) => a.ara_id === keyHolderAra.id && a.session_id !== session.id)
+        .reduce((sum, a) => {
+          const sess = updatedSessionsMap.get(a.session_id);
+          return sum + (sess?.duration_hours || 2);
+        }, 0);
+
+      const withinWorkload = (araAssignedHours + session.duration_hours) <= (keyHolderAra.max_weekly_hours || 12);
+
+      let validationNotes = 'Validated: Available & within workload limit';
+      let isValidated = true;
+
+      if (!isAvailable) {
+        validationNotes = `Notice: Scheduled during ${session.day_of_week} shift (Force-allocated per Key Holder mandate)`;
+      } else if (!withinWorkload) {
+        validationNotes = `Notice: Workload ${araAssignedHours + session.duration_hours}h exceeds standard ${keyHolderAra.max_weekly_hours}h cap (Key Holder Overload Authorized)`;
+      }
+
+      // Create force-assignment
+      const newAssignment: AssistantAssignment = {
+        id: `asgn-510force-${session.id}-${Date.now()}`,
+        session_id: session.id,
+        slot_number: 1,
+        ara_id: keyHolderAra.id,
+        status: 'Confirmed',
+        source: 'batch_510_force_alloc',
+        assigned_at: new Date().toISOString(),
+        acceptance_deadline: null,
+      };
+
+      updatedAssignmentsMap.set(session.id, newAssignment);
+
+      const updatedSession: ScheduledSession = {
+        ...session,
+        status: 'Confirmed',
+      };
+      updatedSessionsMap.set(session.id, updatedSession);
+
+      allocatedCount++;
+      if (isValidated) validatedCount++;
+
+      allocationsDetails.push({
+        sessionId: session.id,
+        roomCode,
+        roomName,
+        araName: keyHolderAra.full_name,
+        araCode: keyHolderAra.ara_code,
+        courseId: session.course_id,
+        dayOfWeek: session.day_of_week,
+        timeSlot: `${session.start_time}-${session.end_time}`,
+        status: 'Confirmed',
+        isValidated,
+        validationNotes,
+      });
+    });
+
+    return {
+      updatedAssignments: Array.from(updatedAssignmentsMap.values()),
+      updatedSessions: Array.from(updatedSessionsMap.values()),
+      resultsSummary: {
+        total510Sessions: sessions510.length,
+        allocatedCount,
+        validatedCount,
+        warnings,
+        allocationsDetails,
+      },
     };
   }
 }

@@ -66,8 +66,19 @@ export const ASTU_TIME_COLUMNS = [
 
 export const OFFICIAL_ASTU_TIMETABLES: AstuRoomTimetable[] = [
   {
-    roomHeader: 'Block B-510 — LAB 1 (Programming & Algorithms)',
-    responsibleAraFallback: 'Dadi Keba (ARA-102)',
+    roomHeader: 'Block B-510 — LAB 6 (Advanced Systems & Network Computing)',
+    responsibleAraFallback: 'Ali Kibret Muhamed (SARA/2026/01)',
+    schedule: {
+      Monday: { morningClass: 'CSEg 3204 Sec 1 (Networks)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 4201 Sec 3 (OS)', afternoonStartCol: 6, afternoonSpan: 2 },
+      Tuesday: { morningClass: 'CSEg 3201 Sec 3 (Adv Prog)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 5207 Sec 3 (Dist. Systems)', afternoonStartCol: 6, afternoonSpan: 2 },
+      Wednesday: { morningClass: 'CSEg 4301 Sec 1 (Data Mining)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 3204 Sec 2 (Networks)', afternoonStartCol: 6, afternoonSpan: 2 },
+      Thursday: { morningClass: 'SEng 4305 Sec 1 (Cloud Arch)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 3201 Sec 4 (Adv Prog)', afternoonStartCol: 6, afternoonSpan: 2 },
+      Friday: { morningClass: 'Open Systems & Research Practicum', morningStartCol: 0, morningSpan: 2, afternoonClass: 'ARA Senior Project Computing', afternoonStartCol: 6, afternoonSpan: 2 },
+    },
+  },
+  {
+    roomHeader: 'Block B-510 — LAB 1 (Introductory Computing & Algorithms)',
+    responsibleAraFallback: 'Milki Muleta (ARA-104)',
     schedule: {
       Monday: { morningClass: 'CSEg 1104 Sec 2 (C++)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 2102 Sec 1 (OOP)', afternoonStartCol: 6, afternoonSpan: 2 },
       Tuesday: { morningClass: 'CSEg 1104 Sec 4 (C++)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 3101 Sec 1 (DSA)', afternoonStartCol: 6, afternoonSpan: 2 },
@@ -77,8 +88,8 @@ export const OFFICIAL_ASTU_TIMETABLES: AstuRoomTimetable[] = [
     },
   },
   {
-    roomHeader: 'Block B-510 — LAB 2 (Object-Oriented Programming & Systems)',
-    responsibleAraFallback: 'Gada Bultum (ARA-103)',
+    roomHeader: 'Block B-510 — LAB 2 (Object-Oriented Programming & Architecture)',
+    responsibleAraFallback: 'Fanos Hinika (ARA-107)',
     schedule: {
       Monday: { morningClass: 'CSEg 2102 Sec 3 (OOP)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 3103 Sec 1 (OS)', afternoonStartCol: 6, afternoonSpan: 2 },
       Tuesday: { morningClass: 'CSEg 2102 Sec 4 (OOP)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 4201 Sec 1 (Networks)', afternoonStartCol: 6, afternoonSpan: 2 },
@@ -89,7 +100,7 @@ export const OFFICIAL_ASTU_TIMETABLES: AstuRoomTimetable[] = [
   },
   {
     roomHeader: 'Block B-509 — LAB 4 (Operating Systems & Infrastructure)',
-    responsibleAraFallback: 'Yared Tolessa (ARA-105)',
+    responsibleAraFallback: 'Mesay Shemsu (ARA-106)',
     schedule: {
       Monday: { morningClass: 'CSEg 3103 Sec 3 (OS)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 5207 Sec 1 (Dist. Systems)', afternoonStartCol: 6, afternoonSpan: 2 },
       Tuesday: { morningClass: 'CSEg 3103 Sec 4 (OS)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 3103 Sec 5 (OS)', afternoonStartCol: 6, afternoonSpan: 2 },
@@ -100,7 +111,7 @@ export const OFFICIAL_ASTU_TIMETABLES: AstuRoomTimetable[] = [
   },
   {
     roomHeader: 'Block B-517 — ROOM 13 (Freshman 1st Year C++ Computing)',
-    responsibleAraFallback: 'Kaleb Sisay (ARA-109)',
+    responsibleAraFallback: 'Abebe Kebede (ARA-001)',
     schedule: {
       Monday: { morningClass: 'CSEg 1104 Sec 16 (C++)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 1104 Sec 18 (C++)', afternoonStartCol: 6, afternoonSpan: 2 },
       Tuesday: { morningClass: 'CSEg 1104 Sec 20 (C++)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 1104 Sec 22 (C++)', afternoonStartCol: 6, afternoonSpan: 2 },
@@ -111,24 +122,13 @@ export const OFFICIAL_ASTU_TIMETABLES: AstuRoomTimetable[] = [
   },
   {
     roomHeader: 'Block B-517 — ROOM 14 (Freshman 1st Year C++ Computing)',
-    responsibleAraFallback: 'Dadi Keba (ARA-102)',
+    responsibleAraFallback: 'Berhanu Endesha (ARA-110)',
     schedule: {
       Monday: { morningClass: 'CSEg 1104 Sec 34 (C++)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 1104 Sec 36 (C++)', afternoonStartCol: 6, afternoonSpan: 2 },
       Tuesday: { morningClass: 'CSEg 1104 Sec 38 (C++)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 1104 Sec 40 (C++)', afternoonStartCol: 6, afternoonSpan: 2 },
       Wednesday: { morningClass: 'CSEg 1104 Sec 42 (C++)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 1104 Sec 44 (C++)', afternoonStartCol: 6, afternoonSpan: 2 },
       Thursday: { morningClass: 'CSEg 1104 Sec 46 (C++)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 1104 Sec 50 (C++)', afternoonStartCol: 6, afternoonSpan: 2 },
       Friday: { morningClass: 'CSEg 1104 Sec 54 (C++)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'Freshman Coding Clinic', afternoonStartCol: 6, afternoonSpan: 2 },
-    },
-  },
-  {
-    roomHeader: 'Block B-510 — LAB 6 (Advanced Systems & Network Computing)',
-    responsibleAraFallback: 'Ali Kibret Muhamed (SARA/2026/01)',
-    schedule: {
-      Monday: { morningClass: 'CSEg 3204 Sec 1 (Networks)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 4201 Sec 3 (OS)', afternoonStartCol: 6, afternoonSpan: 2 },
-      Tuesday: { morningClass: 'CSEg 3201 Sec 3 (Adv Prog)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 5207 Sec 3 (Dist. Systems)', afternoonStartCol: 6, afternoonSpan: 2 },
-      Wednesday: { morningClass: 'CSEg 4301 Sec 1 (Data Mining)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 3204 Sec 2 (Networks)', afternoonStartCol: 6, afternoonSpan: 2 },
-      Thursday: { morningClass: 'SEng 4305 Sec 1 (Cloud Arch)', morningStartCol: 0, morningSpan: 2, afternoonClass: 'CSEg 3201 Sec 4 (Adv Prog)', afternoonStartCol: 6, afternoonSpan: 2 },
-      Friday: { morningClass: 'Open Systems & Research Practicum', morningStartCol: 0, morningSpan: 2, afternoonClass: 'ARA Senior Project Computing', afternoonStartCol: 6, afternoonSpan: 2 },
     },
   },
 ];
@@ -534,36 +534,40 @@ export const OfficialAstuTimetableReport: React.FC<OfficialAstuTimetableReportPr
         )}
 
         {/* Printable Document Body Container */}
-        <div ref={printRef} className="flex-1 overflow-y-auto p-6 sm:p-8 bg-white text-slate-950 print:p-0 print:overflow-visible">
+        <div 
+          id="astu-official-report" 
+          ref={printRef} 
+          className="official-academic-report flex-1 overflow-y-auto p-6 sm:p-8 bg-white dark:bg-slate-900 text-slate-950 dark:text-slate-100 print:p-0 print:overflow-visible print:bg-white print:text-black"
+        >
           {/* Official Document Header (Exact reproduction of ASTU University Standard) */}
-          <div className="text-center pb-6 border-b-2 border-slate-900">
+          <div className="text-center pb-6 border-b-2 border-slate-900 dark:border-slate-700 print:border-black">
             <div className="flex items-center justify-between pb-2">
-              <div className="text-left font-mono text-[10px] text-slate-500">
+              <div className="text-left font-mono text-[10px] text-slate-500 dark:text-slate-400 print:text-slate-700">
                 <div>REF: ASTU/SoEEC/CSE-SE/LAB/2026-S2</div>
                 <div>DOC TYPE: OFFICIAL ALLOCATION SUBMISSION</div>
               </div>
-              <div className="w-12 h-12 rounded-full border-2 border-[#002147] flex items-center justify-center font-serif font-black text-xs text-[#002147]">
+              <div className="w-12 h-12 rounded-full border-2 border-[#002147] dark:border-amber-400 print:border-[#002147] flex items-center justify-center font-serif font-black text-xs text-[#002147] dark:text-amber-400 print:text-[#002147]">
                 ASTU
               </div>
-              <div className="text-right font-mono text-[10px] text-slate-500">
+              <div className="text-right font-mono text-[10px] text-slate-500 dark:text-slate-400 print:text-slate-700">
                 <div>DATE: {new Date().toLocaleDateString()}</div>
                 <div>VERSION: 2.0 (FINAL BATCH)</div>
               </div>
             </div>
 
-            <h1 className="text-lg sm:text-xl font-bold font-serif text-slate-950 uppercase tracking-wide">
+            <h1 className="text-lg sm:text-xl font-bold font-serif text-slate-950 dark:text-white print:text-black uppercase tracking-wide">
               Adama Science and Technology University
             </h1>
-            <h2 className="text-sm sm:text-base font-semibold text-slate-800 mt-0.5">
+            <h2 className="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 print:text-slate-900 mt-0.5">
               School of Electrical Engineering and Computing
             </h2>
-            <h3 className="text-xs sm:text-sm font-semibold text-slate-700 mt-0.5">
+            <h3 className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 print:text-slate-800 mt-0.5">
               Department of Computer Science and Engineering & Software Engineering Program
             </h3>
-            <div className="inline-block mt-2 px-3 py-1 bg-[#002147] text-amber-300 text-xs font-bold uppercase tracking-wider rounded">
+            <div className="inline-block mt-2 px-3 py-1 bg-[#002147] text-amber-300 text-xs font-bold uppercase tracking-wider rounded print:bg-[#002147] print:text-amber-300">
               Academic Assistant (ARA) Laboratory Room Allocations Report — {systemConfig.academic_year} Semester II
             </div>
-            <p className="text-[11px] text-slate-600 mt-1 italic">
+            <p className="text-[11px] text-slate-600 dark:text-slate-400 print:text-slate-700 mt-1 italic">
               Formal submission prepared for Department Head Review, Resource Allocation Audit & Institutional Endorsement
             </p>
           </div>
@@ -887,12 +891,21 @@ export const OfficialAstuTimetableReport: React.FC<OfficialAstuTimetableReportPr
               {/* Master Room Timetable Tables */}
               <div className="space-y-6">
                 {OFFICIAL_ASTU_TIMETABLES.map((table, tIdx) => {
-                  const matchingRoom = rooms.find((r) => table.roomHeader.includes(r.room_code.replace('Room ', 'LAB ')));
-                  const resp = roomResponsibilities.find((r) => r.room_id === matchingRoom?.id && r.status === 'Active');
+                  const matchingRoom = rooms.find((r) => {
+                    if (table.roomHeader.includes(r.room_code)) return true;
+                    if (table.roomHeader.includes('LAB 6') && (r.room_code.includes('LAB 6') || r.id === 'room-510-06')) return true;
+                    if (table.roomHeader.includes('LAB 1') && (r.room_name.includes('LAB 1') || r.room_code.includes('510-02') || r.id === 'room-510-02')) return true;
+                    if (table.roomHeader.includes('LAB 2') && (r.room_name.includes('LAB 2') || r.room_code.includes('510-03') || r.id === 'room-510-03')) return true;
+                    if (table.roomHeader.includes('LAB 4') && (r.room_name.includes('Operating Systems') || r.id === 'room-509-03' || r.id === 'room-509-04')) return true;
+                    if (table.roomHeader.includes('ROOM 13') && (r.room_code.includes('13') || r.id === 'room-517-13')) return true;
+                    if (table.roomHeader.includes('ROOM 14') && (r.room_code.includes('14') || r.id === 'room-517-14')) return true;
+                    return false;
+                  });
+                  const resp = matchingRoom ? roomResponsibilities.find((r) => r.room_id === matchingRoom.id && r.status === 'Active') : null;
                   const ara = resp ? aras.find((a) => a.id === resp.ara_id) : null;
                   const respLabel = ara 
                     ? `${ara.full_name} (${ara.ara_code})`
-                    : (table.responsibleAraFallback || 'TBD / General ARA Key Holder');
+                    : (table.responsibleAraFallback || 'Ali Kibret Muhamed (SARA/2026/01)');
 
                   return (
                     <div key={tIdx} className="border border-slate-400 rounded overflow-hidden break-inside-avoid">

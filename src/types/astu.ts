@@ -125,6 +125,13 @@ export interface ARAQualification {
   certified_by: string;
 }
 
+export type CoursePriorityLevel = 
+  | 'CRITICAL_CORE'
+  | 'HIGH_ENROLLMENT'
+  | 'HARDWARE_INTENSIVE'
+  | 'STANDARD'
+  | 'ELECTIVE';
+
 export interface Course {
   id: string;
   course_code: string; // e.g. 'CSEg1101'
@@ -141,6 +148,48 @@ export interface Course {
   lecture_count?: number;
   lab_count?: number;
   has_lab?: boolean;
+  priority_level?: CoursePriorityLevel;
+  priority_rank?: 1 | 2 | 3 | 4 | 5; // 1 = Highest (Critical), 5 = Lowest (Elective)
+  precedence_score?: number; // 1 to 100 (higher = prioritized in allocation)
+  required_ara_per_room?: number; // 1 or 2
+  precedence_reason?: string;
+  special_assistance_required?: boolean;
+}
+
+export interface DownloadReportRecord {
+  id: string;
+  report_title: string;
+  academic_term: string;
+  generated_at: string;
+  generated_by_name: string;
+  generated_by_role: string;
+  scope_description: string;
+  total_sessions: number;
+  total_rooms: number;
+  total_aras: number;
+  file_format: 'PDF' | 'CSV';
+  file_size: string;
+  download_count: number;
+  status: 'Official & Sealed' | 'Draft Matrix' | 'Pre-Approval';
+}
+
+export interface ConflictAlertEvent {
+  id: string;
+  timestamp: string;
+  ara_id: string;
+  ara_name: string;
+  ara_code: string;
+  target_session_id: string;
+  target_course_code: string;
+  target_room_code: string;
+  target_time: string;
+  conflicting_session_id: string;
+  conflicting_course_code: string;
+  conflicting_room_code: string;
+  conflicting_time: string;
+  day_of_week: string;
+  override_reason?: string;
+  severity: 'CRITICAL_COLLISION' | 'WORKLOAD_CAP_EXCEEDED' | 'ROOM_LOCKOUT';
 }
 
 export interface ScheduledSession {
@@ -168,6 +217,8 @@ export interface AssistantAvailability {
   end_time: string;
   is_available: boolean;
 }
+
+export type ARAAvailability = AssistantAvailability;
 
 export interface AssistantPreference {
   id: string;
@@ -197,7 +248,7 @@ export interface AssistantAssignment {
   slot_number: number; // 1, 2, etc. (Multi-ARA Section 12)
   ara_id: string;
   status: 'Tentative' | 'Confirmed' | 'Declined';
-  source: 'batch_engine' | 'realtime_submission' | 'authorized_override' | 'manual_admin';
+  source: 'batch_engine' | 'realtime_submission' | 'authorized_override' | 'manual_admin' | 'batch_510_force_alloc';
   assigned_at: string;
   confirmed_at?: string | null;
   acceptance_deadline?: string | null;

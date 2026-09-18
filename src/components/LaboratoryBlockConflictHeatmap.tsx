@@ -7,7 +7,8 @@ import {
   AssistantAssignment,
   PreferenceSubmission,
   ARABlockResponsibility, 
-  ARARoomResponsibility 
+  ARARoomResponsibility,
+  UserRole
 } from '../types/astu';
 import { 
   Flame, 
@@ -26,8 +27,11 @@ import {
   ArrowUpDown,
   LayoutGrid,
   Grid3X3,
-  HelpCircle
+  HelpCircle,
+  Wrench,
+  Edit3
 } from 'lucide-react';
+import { RoomAllocationFixModal } from './RoomAllocationFixModal';
 
 interface LaboratoryBlockConflictHeatmapProps {
   blocks: LaboratoryBlock[];
@@ -38,7 +42,11 @@ interface LaboratoryBlockConflictHeatmapProps {
   preferences: PreferenceSubmission[];
   blockResponsibilities: ARABlockResponsibility[];
   roomResponsibilities: ARARoomResponsibility[];
+  currentUserRole?: UserRole;
   onSelectRoom?: (room: LaboratoryRoom) => void;
+  onUpdateRoomResponsibility?: (resp: ARARoomResponsibility) => void;
+  onAssignAraToSession?: (sessionId: string, araId: string, isOverride?: boolean, reason?: string) => void;
+  onSelectSession?: (session: ScheduledSession) => void;
 }
 
 export interface RoomContentionData {
@@ -68,13 +76,20 @@ export const LaboratoryBlockConflictHeatmap: React.FC<LaboratoryBlockConflictHea
   preferences,
   blockResponsibilities,
   roomResponsibilities,
+  currentUserRole = 'ARA_ADMINISTRATOR',
   onSelectRoom,
+  onUpdateRoomResponsibility,
+  onAssignAraToSession,
+  onSelectSession,
 }) => {
   const [selectedBlockId, setSelectedBlockId] = useState<string>('all');
   const [contentionFilter, setContentionFilter] = useState<'all' | 'critical' | 'moderate' | 'balanced' | 'uncovered'>('all');
   const [viewMode, setViewMode] = useState<'grid_2d' | 'cards'>('grid_2d');
   const [activeInspectorRoomId, setActiveInspectorRoomId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'contention' | 'hours' | 'preferences' | 'ratio'>('contention');
+  const [editingRoom, setEditingRoom] = useState<LaboratoryRoom | null>(null);
+
+  const canEdit = currentUserRole === 'ARA_ADMINISTRATOR' || currentUserRole === 'DEPARTMENT_HEAD';
 
   // Compute contention and 2D density metrics for every laboratory room
   const roomContentionList: RoomContentionData[] = useMemo(() => {
@@ -464,6 +479,7 @@ export const LaboratoryBlockConflictHeatmap: React.FC<LaboratoryBlockConflictHea
                   <th className="p-3 font-semibold text-center min-w-[90px]">Weekly Density</th>
                   <th className="p-3 font-semibold text-center min-w-[100px]">Session : ARA Ratio</th>
                   <th className="p-3 font-semibold text-center min-w-[100px]">Contention Score</th>
+                  <th className="p-3 font-semibold text-center min-w-[110px] sticky right-0 bg-[#002147] z-10">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
@@ -585,7 +601,7 @@ export const LaboratoryBlockConflictHeatmap: React.FC<LaboratoryBlockConflictHea
                       </td>
 
                       {/* Contention Score Meter */}
-                      <td className="p-3 text-center">
+                      <td className="p-3 text-center border-r border-slate-200">
                         <div className="flex items-center justify-center gap-1.5">
                           <span
                             className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
@@ -603,6 +619,24 @@ export const LaboratoryBlockConflictHeatmap: React.FC<LaboratoryBlockConflictHea
                           <span className="text-[10px] text-slate-500 font-semibold uppercase">
                             {item.contentionLevel}
                           </span>
+                        </div>
+                      </td>
+
+                      {/* Actions Column with Fix/Edit Button */}
+                      <td className="p-2 text-center sticky right-0 bg-white hover:bg-slate-50 z-10">
+                        <div className="flex items-center justify-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveInspectorRoomId(item.room.id);
+                              setEditingRoom(item.room);
+                            }}
+                            className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-slate-900 bg-amber-400 hover:bg-amber-300 rounded-md border border-amber-500 shadow-2xs transition-all active:scale-95"
+                            title="Edit / Fix Room Allocation and Key Custody"
+                          >
+                            <Wrench className="w-3 h-3 text-slate-950" />
+                            <span>Fix / Edit</span>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -736,11 +770,22 @@ export const LaboratoryBlockConflictHeatmap: React.FC<LaboratoryBlockConflictHea
                   )}
                 </div>
 
-                <div className="mt-3 flex items-center justify-between text-[10px] text-slate-500 font-medium">
-                  <span>Click to inspect details</span>
+                <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
                   <span className="text-[#002147] font-bold flex items-center gap-0.5">
-                    View Details <ChevronRight className="w-3 h-3" />
+                    Inspect <ChevronRight className="w-3 h-3" />
                   </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveInspectorRoomId(item.room.id);
+                      setEditingRoom(item.room);
+                    }}
+                    className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold text-slate-900 bg-amber-400 hover:bg-amber-300 rounded-md border border-amber-500 shadow-2xs transition-all active:scale-95"
+                  >
+                    <Wrench className="w-3 h-3 text-slate-950" />
+                    <span>Fix / Edit</span>
+                  </button>
                 </div>
               </div>
             );
@@ -772,6 +817,14 @@ export const LaboratoryBlockConflictHeatmap: React.FC<LaboratoryBlockConflictHea
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setEditingRoom(inspectorData.room)}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-slate-900 bg-amber-400 hover:bg-amber-300 rounded-lg border border-amber-500 shadow-sm transition-all active:scale-95"
+              >
+                <Wrench className="w-3.5 h-3.5 text-slate-950" />
+                <span>Fix Allocation & Custody (Admin/Head)</span>
+              </button>
               <button
                 onClick={() => setActiveInspectorRoomId(null)}
                 className="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors"
@@ -898,6 +951,24 @@ export const LaboratoryBlockConflictHeatmap: React.FC<LaboratoryBlockConflictHea
             </div>
           </div>
         </div>
+      )}
+
+      {/* Quick Fix / Edit Room Allocation Modal */}
+      {editingRoom && (
+        <RoomAllocationFixModal
+          isOpen={!!editingRoom}
+          onClose={() => setEditingRoom(null)}
+          room={editingRoom}
+          block={blocks.find((b) => b.id === editingRoom.block_id)}
+          contentionData={roomContentionList.find((r) => r.room.id === editingRoom.id)}
+          aras={aras}
+          sessions={sessions}
+          assignments={assignments}
+          roomResponsibilities={roomResponsibilities}
+          currentRole={currentUserRole}
+          onUpdateRoomResponsibility={onUpdateRoomResponsibility}
+          onAssignAraToSession={onAssignAraToSession}
+        />
       )}
     </div>
   );

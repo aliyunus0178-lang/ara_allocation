@@ -1,5 +1,5 @@
-import React from 'react';
-import { WeightConfiguration, SystemConfig } from '../types/astu';
+import React, { useState } from 'react';
+import { WeightConfiguration, SystemConfig, Course } from '../types/astu';
 import { 
   Sliders, 
   RotateCcw, 
@@ -8,25 +8,38 @@ import {
   Sparkles, 
   CheckCircle2, 
   Info,
-  Scale
+  Scale,
+  Award,
+  Zap,
+  Check,
+  Search,
+  ShieldAlert
 } from 'lucide-react';
 import { INITIAL_WEIGHT_CONFIGURATIONS } from '../data/mockAstuData';
 
 interface ScoringWeightsEditorProps {
   weights: WeightConfiguration[];
   systemConfig: SystemConfig;
+  courses?: Course[];
   onUpdateWeight: (id: string, newWeight: number, isEnabled: boolean) => void;
   onUpdateSystemConfig: (updated: Partial<SystemConfig>) => void;
   onResetWeightsToDefault: () => void;
+  onUpdateCoursePriority?: (courseId: string, updates: Partial<Course>) => void;
+  onHighPrecedenceAutoFill?: () => void;
 }
 
 export const ScoringWeightsEditor: React.FC<ScoringWeightsEditorProps> = ({
   weights,
   systemConfig,
+  courses = [],
   onUpdateWeight,
   onUpdateSystemConfig,
   onResetWeightsToDefault,
+  onUpdateCoursePriority,
+  onHighPrecedenceAutoFill,
 }) => {
+  const [courseSearchQuery, setCourseSearchQuery] = useState('');
+  const [priorityFeedback, setPriorityFeedback] = useState<string | null>(null);
   return (
     <div className="space-y-6">
       {/* Top Banner */}
@@ -265,6 +278,191 @@ export const ScoringWeightsEditor: React.FC<ScoringWeightsEditorProps> = ({
                 </span>
               </label>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================= */}
+      {/* COURSE PRIORITY & CAPSTONE / FYP PRECEDENCE CONFIG       */}
+      {/* ========================================================= */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-3 border-b border-slate-100">
+          <div>
+            <div className="flex items-center gap-2">
+              <Award className="w-4 h-4 text-amber-600" />
+              <h3 className="font-bold text-sm text-slate-900 uppercase tracking-wider font-serif">
+                Course Priority & Capstone / Final Year Project Precedence Configuration
+              </h3>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Guarantees that high-stakes Capstone and Final Year Project courses are assigned available assistant hours first during assistance scarcity.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (!courses || !onUpdateCoursePriority) return;
+              const capstoneCourses = courses.filter((c) =>
+                c.course_name.toLowerCase().includes('capstone') ||
+                c.course_name.toLowerCase().includes('final year project') ||
+                c.course_name.toLowerCase().includes('capston') ||
+                c.course_code.includes('5307') ||
+                c.course_code.includes('4203') ||
+                c.course_code.includes('5213')
+              );
+              capstoneCourses.forEach((c) => {
+                onUpdateCoursePriority(c.id, {
+                  priority_level: 'CRITICAL_CORE',
+                  priority_rank: 1,
+                  precedence_score: 100,
+                  special_assistance_required: true,
+                });
+              });
+              if (onHighPrecedenceAutoFill) {
+                onHighPrecedenceAutoFill();
+              }
+              setPriorityFeedback(`Successfully boosted ${capstoneCourses.length} Capstone & FYP courses and executed High-Precedence Auto-Fill!`);
+              setTimeout(() => setPriorityFeedback(null), 4000);
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-[#002147] hover:bg-[#001733] text-amber-400 font-bold text-xs rounded-lg shadow-sm border border-amber-500/40 transition-all cursor-pointer"
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-300" />
+            <span>Force High-Precedence for Capstone & FYP</span>
+          </button>
+        </div>
+
+        {priorityFeedback && (
+          <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-lg text-emerald-900 text-xs font-semibold flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{priorityFeedback}</span>
+          </div>
+        )}
+
+        <div className="bg-amber-50 p-3.5 rounded-xl border border-amber-200 text-xs text-amber-950 leading-relaxed flex items-start gap-2.5">
+          <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <strong>Assistant Scarcity Protection Policy:</strong> When available ARA/SARA assistant hours are scarce, courses explicitly flagged with <strong>High-Precedence (CRITICAL_CORE)</strong> will consume qualified assistant capacity first before lower-tier or general lab sessions are considered.
+          </div>
+        </div>
+
+        {/* Course Cards / Table */}
+        <div className="space-y-3 pt-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span className="font-bold text-slate-800 uppercase tracking-wider text-[11px] font-mono">
+              Departmental Courses ({courses?.length || 0})
+            </span>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search by code or course name..."
+                value={courseSearchQuery}
+                onChange={(e) => setCourseSearchQuery(e.target.value)}
+                className="px-3 py-1.5 rounded-lg border border-slate-300 bg-slate-50 text-slate-900 text-xs w-64 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
+            {courses
+              ?.filter((c) =>
+                courseSearchQuery
+                  ? c.course_code.toLowerCase().includes(courseSearchQuery.toLowerCase()) ||
+                    c.course_name.toLowerCase().includes(courseSearchQuery.toLowerCase())
+                  : true
+              )
+              .map((c) => {
+                const isCapstone =
+                  c.course_name.toLowerCase().includes('capstone') ||
+                  c.course_name.toLowerCase().includes('final year project') ||
+                  c.course_name.toLowerCase().includes('capston') ||
+                  c.course_code.includes('5307') ||
+                  c.course_code.includes('4203') ||
+                  c.course_code.includes('5213');
+
+                const isHighPrecedence = c.priority_level === 'CRITICAL_CORE' || (c.precedence_score || 0) >= 90;
+
+                return (
+                  <div
+                    key={c.id}
+                    className={`p-3.5 rounded-xl border space-y-2 text-xs transition-all ${
+                      isCapstone
+                        ? 'bg-amber-50/70 border-amber-300'
+                        : isHighPrecedence
+                        ? 'bg-emerald-50/50 border-emerald-300'
+                        : 'bg-slate-50/80 border-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="flex items-center gap-1.5 font-mono font-bold text-slate-900">
+                          <span>{c.course_code}</span>
+                          {isCapstone && (
+                            <span className="bg-amber-200 text-amber-900 px-1.5 py-0.2 rounded text-[9px] font-bold">
+                              Capstone / FYP
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="font-semibold text-slate-700 text-xs mt-0.5 line-clamp-1">
+                          {c.course_name}
+                        </h4>
+                      </div>
+
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                          isHighPrecedence
+                            ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                            : 'bg-slate-200 text-slate-700'
+                        }`}
+                      >
+                        {c.priority_level || 'NORMAL'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-200/60">
+                      <div className="flex items-center gap-2 text-[11px]">
+                        <span className="text-slate-500 font-medium">Precedence Score:</span>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={c.precedence_score || 50}
+                          onChange={(e) => {
+                            if (onUpdateCoursePriority) {
+                              onUpdateCoursePriority(c.id, { precedence_score: Number(e.target.value) || 0 });
+                            }
+                          }}
+                          className="w-14 bg-white border border-slate-300 rounded px-1.5 py-0.5 text-right font-mono font-bold text-slate-900"
+                        />
+                        <span className="text-slate-400">pts</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (onUpdateCoursePriority) {
+                            const newLevel = isHighPrecedence ? 'ELECTIVE' : 'CRITICAL_CORE';
+                            const newScore = isHighPrecedence ? 50 : 100;
+                            onUpdateCoursePriority(c.id, {
+                              priority_level: newLevel,
+                              priority_rank: isHighPrecedence ? 3 : 1,
+                              precedence_score: newScore,
+                              special_assistance_required: true,
+                            });
+                          }
+                        }}
+                        className={`px-2.5 py-1 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                          isHighPrecedence
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs'
+                            : 'bg-slate-200 hover:bg-amber-500 hover:text-slate-950 text-slate-800'
+                        }`}
+                      >
+                        {isHighPrecedence ? '✓ High Precedence Flagged' : '+ Flag High Precedence'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
           </div>
         </div>
       </div>
